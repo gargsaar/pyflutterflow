@@ -1,0 +1,19 @@
+
+{
+  "models": {
+    "entities": {
+      "display_name": "Entities",
+      "collection_name": "entities",
+      "fields": [
+        {
+          "fieldName": "name",
+          "type": "String"
+        },
+        {
+          "fieldName": "description",
+          "type": "String"
+        }
+      ]
+    }
+  }
+}
