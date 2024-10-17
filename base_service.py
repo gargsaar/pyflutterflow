@@ -1,10 +1,10 @@
 from typing import Generic
 from fastapi import Depends, HTTPException, status
 from fastapi_pagination import Page, Params
-from pyflutterflow.database.interface import BaseRepositoryInterface
-from pyflutterflow.database import ModelType, CreateSchemaType, UpdateSchemaType
-from app.services.auth import get_current_user, FirebaseUser, get_admin_user
-from app.logs import get_logger
+from .database.interface import BaseRepositoryInterface
+from .database import ModelType, CreateSchemaType, UpdateSchemaType
+from .auth import get_current_user, FirebaseUser, get_admin_user
+from .logs import get_logger
 
 logger = get_logger(__name__)
 

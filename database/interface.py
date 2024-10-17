@@ -1,15 +1,15 @@
-
+import os
 from typing import Generic
 from abc import ABC, abstractmethod
 from fastapi_pagination import Page, Params
-from pyflutterflow.database import ModelType, CreateSchemaType, UpdateSchemaType
-from pyflutterflow.BaseModels import DBTarget
-from app.services.auth import FirebaseUser
-from app.logs import get_logger
-from app.settings import get_settings
+from ..database import ModelType, CreateSchemaType, UpdateSchemaType
+from ..BaseModels import DBTarget
+from ..auth import FirebaseUser
+from ..logs import get_logger
 
-settings = get_settings()
 logger = get_logger(__name__)
+
+DB_TARGETS = os.getenv("DB_TARGETS")
 
 
 class BaseRepositoryInterface(ABC, Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
@@ -40,7 +40,7 @@ class BaseRepositoryInterface(ABC, Generic[ModelType, CreateSchemaType, UpdateSc
 
 
 def get_targets(collection_name):
-    target = settings.db_targets.get(collection_name)
+    target = DB_TARGETS.get(collection_name)
     if target is None:
         target = {'read_from': 'firestore', 'write_to': 'firestore'}
 

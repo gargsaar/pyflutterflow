@@ -1,13 +1,13 @@
 from typing import Generic
 from beanie import PydanticObjectId
 from fastapi_pagination import Page, Params
-from pyflutterflow.database.firestore.firestore_repository import FirestoreRepository
-from pyflutterflow.database.mongodb.mongo_repository import MongoRepository
-from pyflutterflow.database.interface import BaseRepositoryInterface
-from pyflutterflow.database import ModelType, CreateSchemaType, UpdateSchemaType
-from pyflutterflow.BaseModels import DBTarget
-from app.services.auth import FirebaseUser
-from app.logs import get_logger
+from ..database.firestore.firestore_repository import FirestoreRepository
+from ..database.mongodb.mongo_repository import MongoRepository
+from ..database.interface import BaseRepositoryInterface
+from ..database import ModelType, CreateSchemaType, UpdateSchemaType
+from ..BaseModels import DBTarget
+from ..auth import FirebaseUser
+from ..logs import get_logger
 
 logger = get_logger(__name__)
 
@@ -56,6 +56,7 @@ class DualRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Update
         return entity
 
     async def update(self, id: str, data: UpdateSchemaType, current_user: FirebaseUser) -> ModelType:
+        entity = None
         if self.write_to == DBTarget.BOTH or self.write_to == DBTarget.FIRESTORE:
             try:
                 entity = await self.firestore.update(id, data, current_user)

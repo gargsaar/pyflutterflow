@@ -1,12 +1,12 @@
 from typing import Generic
 from beanie import PydanticObjectId
 from fastapi_pagination import Params, Page
-from pyflutterflow.database.firestore.firestore_client import FirestoreClient
-from pyflutterflow.database.interface import BaseRepositoryInterface
-from pyflutterflow.database import ModelType, CreateSchemaType, UpdateSchemaType
-from app.services.auth import FirebaseUser
-from app.logs import get_logger
-from app import constants
+from ...database.firestore.firestore_client import FirestoreClient
+from ...database.interface import BaseRepositoryInterface
+from ...database import ModelType, CreateSchemaType, UpdateSchemaType
+from ...auth import FirebaseUser
+from ...logs import get_logger
+import constants
 
 logger = get_logger(__name__)
 

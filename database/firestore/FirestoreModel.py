@@ -1,8 +1,7 @@
 from datetime import datetime, timezone
 from pydantic import Field
-from pyflutterflow.BaseModels import AppBaseModel
-from pyflutterflow.database.firestore.firestore_client import FirestoreClient
-from pyflutterflow.database import UpdateSchemaType
+from ...BaseModels import AppBaseModel
+from ...database.firestore.firestore_client import FirestoreClient
 
 
 class FirestoreModel(AppBaseModel):
