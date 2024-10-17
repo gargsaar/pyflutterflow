@@ -2,7 +2,7 @@ from typing import Generic
 from fastapi import HTTPException, status
 from fastapi_pagination import Params, Page
 from fastapi_pagination.ext.beanie import paginate
-import constants
+# from ... import constants
 from ...database.interface import BaseRepositoryInterface
 from ...database import ModelType, CreateSchemaType, UpdateSchemaType
 from ...auth import FirebaseUser

@@ -1,10 +1,10 @@
 from typing import Generic
 from beanie import PydanticObjectId
 from fastapi_pagination import Page, Params
-from ..database.firestore.firestore_repository import FirestoreRepository
-from ..database.mongodb.mongo_repository import MongoRepository
-from ..database.interface import BaseRepositoryInterface
-from ..database import ModelType, CreateSchemaType, UpdateSchemaType
+from pyflutterflow.database.firestore.firestore_repository import FirestoreRepository
+from .mongodb.mongo_repository import MongoRepository
+from .interface import BaseRepositoryInterface
+from . import ModelType, CreateSchemaType, UpdateSchemaType
 from ..BaseModels import DBTarget
 from ..auth import FirebaseUser
 from ..logs import get_logger

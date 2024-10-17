@@ -6,7 +6,7 @@ from ...database.interface import BaseRepositoryInterface
 from ...database import ModelType, CreateSchemaType, UpdateSchemaType
 from ...auth import FirebaseUser
 from ...logs import get_logger
-import constants
+# from ... import constants
 
 logger = get_logger(__name__)
 
