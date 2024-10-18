@@ -1,12 +1,9 @@
-import os
 from google.oauth2 import service_account
 from google.cloud.firestore_v1 import AsyncClient
 from ...logs import get_logger
+from ... import get_settingsff
 
 logger = get_logger(__name__)
-
-FIREBASE_CONFIG = os.getenv("FIREBASE_CONFIG")
-
 
 class FirestoreClient:
     """
@@ -24,7 +21,8 @@ class FirestoreClient:
 
     @classmethod
     def init(cls) -> None:
-        credentials = service_account.Credentials.from_service_account_info(FIREBASE_CONFIG)
+        settings = get_settingsff()
+        credentials = service_account.Credentials.from_service_account_info(settings.firebase_config)
         firestore_client = AsyncClient(credentials=credentials)
         cls.set_client(firestore_client)
 
