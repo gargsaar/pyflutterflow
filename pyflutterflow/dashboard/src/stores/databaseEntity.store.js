@@ -21,8 +21,16 @@ export const useDatabaseEntityStore = defineStore({
       return data
     },
 
-    async createDatabaseEntity(payload) {
-      await api.post(`${collectionName}/${key}`, payload)
+    async upsertDatabaseEntity(collectionName, key, payload) {
+      if (key === 'create') {
+        return this.createDatabaseEntity(collectionName, payload)
+      } else {
+        return this.updateDatabaseEntity(collectionName, key, payload)
+      }
+    },
+
+    async createDatabaseEntity(collectionName, payload) {
+      await api.post(collectionName, payload)
     },
 
     async updateDatabaseEntity(collectionName, key, payload) {

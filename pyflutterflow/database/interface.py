@@ -5,7 +5,7 @@ from ..database import ModelType, CreateSchemaType, UpdateSchemaType
 from ..BaseModels import DBTarget
 from ..auth import FirebaseUser
 from ..logs import get_logger
-from .. import settingsff
+from .. import env_vars
 
 
 logger = get_logger(__name__)
@@ -39,7 +39,7 @@ class BaseRepositoryInterface(ABC, Generic[ModelType, CreateSchemaType, UpdateSc
 
 
 def get_targets(collection_name):
-    target = settingsff.db_targets.get(collection_name)
+    target = env_vars.db_targets.get(collection_name)
     if target is None:
         target = {'read_from': 'firestore', 'write_to': 'firestore'}
 

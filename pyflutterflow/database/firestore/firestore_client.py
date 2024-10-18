@@ -1,7 +1,7 @@
 from google.oauth2 import service_account
 from google.cloud.firestore_v1 import AsyncClient
-from ...logs import get_logger
-from ... import get_settingsff
+from pyflutterflow.logs import get_logger
+from pyflutterflow import get_environment
 
 logger = get_logger(__name__)
 
@@ -21,8 +21,8 @@ class FirestoreClient:
 
     @classmethod
     def init(cls) -> None:
-        settings = get_settingsff()
-        credentials = service_account.Credentials.from_service_account_info(settings.firebase_config)
+        env_vars = get_environment()
+        credentials = service_account.Credentials.from_service_account_info(env_vars.firebase_config)
         firestore_client = AsyncClient(credentials=credentials)
         cls.set_client(firestore_client)
 

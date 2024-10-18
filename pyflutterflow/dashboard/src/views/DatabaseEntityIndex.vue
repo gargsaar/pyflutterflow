@@ -1,11 +1,14 @@
-
 <template>
-    <h1 class="text-xl my-6">{{ schema.display_name }} collection</h1>
+    <h1 class="text-xl my-6">{{ schema.display_name }} collection
+        <router-link :to="`/${route.params.entity}/new`">
+            <Button icon="fa-solid fa-plus text-green-600" text />
+        </router-link>
+    </h1>
     <div>
         <ul v-if="databaseEntityIndex">
             <li v-for="databaseEntity in databaseEntityIndex.items" :key="databaseEntity.id">
-                <router-link class="w-full outline" :to="`/entities/${databaseEntity.id}`">
-                    <div  class="outline outline-1 outline-surface-200 rounded-lg shadow p-3 my-3 hover:shadow-lg">
+                <router-link class="w-full outline" :to="`/${route.params.entity}/${databaseEntity.id}`">
+                    <div class="outline outline-1 outline-surface-200 rounded-lg shadow p-3 my-3 hover:shadow-lg">
                         {{ databaseEntity[schema.fields[0].fieldName] }}
                     </div>
                 </router-link>
@@ -25,6 +28,7 @@ import { useRoute } from "vue-router";
 import { computed, ref } from 'vue';
 import { useDatabaseEntityStore } from '@/stores/databaseEntity.store';
 import config from '@/configure.json';
+import Button from 'primevue/button';
 
 const route = useRoute();
 const databaseEntityStore = useDatabaseEntityStore();
