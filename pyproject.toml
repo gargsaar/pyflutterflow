@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyflutterflow"
-version = "0.0.1"
+version = "0.0.4"
 description = "The companion python library to Flutterflow"
 authors = ["John Kealy <johnckealy.dev@gmail.com>"]
 license = "MIT"
@@ -22,6 +22,9 @@ uvloop = "^0.20.0"
 jinja2 = "^3.1.4"
 fastapi-pagination = "^0.12.31"
 
+
+[tool.poetry.package]
+include = ["pyflutterflow/dashboard/dist/*"]
 
 [build-system]
 requires = ["poetry-core"]

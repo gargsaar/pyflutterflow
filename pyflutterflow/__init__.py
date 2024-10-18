@@ -1,10 +1,11 @@
+import importlib.resources as resources
 from pydantic_settings import BaseSettings
 from fastapi.staticfiles import StaticFiles
-from pyflutterflow.logs import get_logger
 
 
 def init_pyflutterflow():
-    return "/static", StaticFiles(directory="/home/jokea/KealyStudio/pyflutterflow/pyflutterflow/dashboard/dist", html=True), "vue_app"
+    with resources.path("pyflutterflow.dashboard", "dist") as static_path:
+        return "/dashboard", StaticFiles(directory=str(static_path), html=True), "vue_app"
 
 
 settingsff = None

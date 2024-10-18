@@ -9,7 +9,7 @@ import SignupView from '@/views/AuthViews/SignupView.vue'
 import NotFound404 from '@/views/NotFound404.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory('/dashboard'),
   routes: [
     {
       path: '/',
