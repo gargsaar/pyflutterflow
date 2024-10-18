@@ -5,7 +5,7 @@ from fastapi import status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from firebase_admin.auth import ExpiredIdTokenError
 from firebase_admin import auth
-from . import constants
+from pyflutterflow import constants
 from pyflutterflow.logs import get_logger
 
 logger = get_logger(__name__)

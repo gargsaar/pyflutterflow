@@ -2,17 +2,25 @@ import importlib.resources as resources
 from pydantic_settings import BaseSettings
 from fastapi.staticfiles import StaticFiles
 
-env_vars = None
 
+class PyFlutterFlow:
 
-def get_environment(settings_data: BaseSettings | None = None):
-    global env_vars
-    if settings_data:
-        env_vars = settings_data
-    return env_vars
+    _instance = None
 
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(PyFlutterFlow, cls).__new__(cls)
+        return cls._instance
 
-def init_pyflutterflow(settings):
-    get_environment(settings)
-    with resources.path("pyflutterflow.dashboard", "dist") as static_path:
-        return "/dashboard", StaticFiles(directory=str(static_path), html=True), "vue_app"
+    def __init__(self, settings: BaseSettings | None = None):
+        if settings:
+            self.settings = settings
+
+    def get_environment(self):
+        if not hasattr(self, 'settings'):
+            raise ValueError("The Pyflutterflow environment was not initialized. Be sure to initialize Pyflutterflow(settings) in each service.")
+        return self.settings
+
+    def init_dashboard(self):
+        with resources.path("pyflutterflow.dashboard", "dist") as static_path:
+            return "/dashboard", StaticFiles(directory=str(static_path), html=True), "vue_app"
