@@ -150,7 +150,7 @@ export const useAuthStore = defineStore({
     },
 
     async getDashboardConfig() {
-      const { data } = await api.get('/configure');
+      const { data } = await api.get('/getconf');
       this.dashboardConfig = data;
       return data;
     }
