@@ -1,5 +1,4 @@
 <template>
-
   <Menu v-if="authStore.user" :model="menuItems" :pt="sideNavStyles">
     <template #item="{ item, props }">
       <router-link :to="`/${item.collection_name}`" v-bind="props.action" class="!my-2 !py-4 flex gap-4"
@@ -9,6 +8,7 @@
       </router-link>
     </template>
   </Menu>
+
 
   <router-link v-else to="/">
     <Button @click="sideBarVisible = false" class="w-fit mt-1" icon="fa-solid fa-arrow-left" label="Back to home" type="button" severity="secondary"
@@ -21,19 +21,22 @@
 
 <script setup>
 
-import { ref, computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import Menu from 'primevue/menu';
 import { useRoute } from "vue-router";
 import Button from 'primevue/button';
 import sideNavStyles from '@/presets/Aura/sidenavmenu'
 import { useAuthStore } from '@/stores/auth.store';
 import LoadingIndicators from '@/components/LoadingIndicators.vue';
-import config from '@/configure.json';
 
 const props = defineProps(["modelValue"]);
 const emit = defineEmits(["update:modelValue"]);
 const authStore = useAuthStore();
 const route = useRoute();
+
+onMounted(async() => {
+  await authStore.getDashboardConfig()
+})
 
 const sideBarVisible = computed({
   get() {
@@ -44,7 +47,7 @@ const sideBarVisible = computed({
   },
 });
 
-const menuItems = computed(() => config.models)
+const menuItems = computed(() => authStore.dashboardConfig.models)
 
 
 </script>

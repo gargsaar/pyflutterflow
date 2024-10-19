@@ -5,7 +5,7 @@ from pyflutterflow.database import ModelType, CreateSchemaType, UpdateSchemaType
 from pyflutterflow.BaseModels import DBTarget
 from pyflutterflow.auth import FirebaseUser
 from pyflutterflow.logs import get_logger
-from pyflutterflow import PyFlutterFlow
+from pyflutterflow import PyFlutterflow
 
 
 logger = get_logger(__name__)
@@ -39,7 +39,7 @@ class BaseRepositoryInterface(ABC, Generic[ModelType, CreateSchemaType, UpdateSc
 
 
 def get_targets(collection_name):
-    settings = PyFlutterFlow().get_environment()
+    settings = PyFlutterflow().get_environment()
     target = settings.db_targets.get(collection_name)
     if target is None:
         target = {'read_from': 'firestore', 'write_to': 'firestore'}

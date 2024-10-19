@@ -10,7 +10,7 @@ import EmailVerificationModal from '@/components/auth/EmailVerificationModal.vue
   <Toast />
   <EmailVerificationModal />
   <Layout>
-    <RouterView />
+    <RouterView :key="$route.fullPath" />
   </Layout>
 
 </template>

@@ -25,23 +25,27 @@ import { computed, onMounted, ref } from 'vue';
 import Button from 'primevue/button';
 import { useRoute, useRouter } from "vue-router";
 import { useDatabaseEntityStore } from '@/stores/databaseEntity.store';
-import config from '@/configure.json';
 import InputText from 'primevue/inputtext';
 import { useToast } from 'primevue/usetoast';
-const toast = useToast();
+import { useAuthStore } from '@/stores/auth.store';
 
+const authStore = useAuthStore();
+const toast = useToast();
 const data = ref({});
 const route = useRoute();
 const router = useRouter();
-const schema = computed(() => config.models[route.params.entity])
 const databaseEntityStore = useDatabaseEntityStore();
+const schema = ref({})
 
 onMounted(async() => {
+    schema.value = authStore.dashboardConfig.models.find(obj => obj.collection_name === route.params.entity);
     data.value = await databaseEntityStore.getDatabaseEntityDetail(route.params.entity, route.params.id)
 })
 
 const handleSave = async() => {
     await databaseEntityStore.upsertDatabaseEntity(route.params.entity, route.params.id, data.value)
+    if (route.params.id === 'create')
+        router.push(`/${route.params.entity}`)
     toast.add({ severity: 'success', summary: "Document updated", detail: `The database entry was saved successfully`, life: 3000 });
 }
 

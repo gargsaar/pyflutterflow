@@ -6,9 +6,10 @@ import {
   signOutWithFirebase,
   passwordResetEmail,
   updateProfileWithFirebase,
-  firebaseEmailSignup
+  firebaseEmailSignup,
 } from "@/services/firebase";
 import { getAuth, onAuthStateChanged, sendEmailVerification } from "firebase/auth";
+import api from '@/services/api';
 
 export const useAuthStore = defineStore({
   id: "auth",
@@ -17,7 +18,8 @@ export const useAuthStore = defineStore({
     accessToken: null,
     isCheckingAuth: false,
     authErrorMessage: null,
-    showEmailVerificationModal: false
+    showEmailVerificationModal: false,
+    dashboardConfig: {}
   }),
 
   getters: {
@@ -145,6 +147,12 @@ export const useAuthStore = defineStore({
     async signOut() {
       await signOutWithFirebase();
       this.user = null;
+    },
+
+    async getDashboardConfig() {
+      const { data } = await api.get('/configure');
+      this.dashboardConfig = data;
+      return data;
     }
   }
 
