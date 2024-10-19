@@ -16,8 +16,8 @@ async def initialize_mongodb(document_models):
     """
     settings = PyFlutterflow().get_environment()
     try:
-        client = AsyncIOMotorClient(f"mongodb://{settings.db_user}:{settings.db_password}@{settings.db_host}/{settings.db_name}?authSource=admin")
         logger.info("Initializing MongoDB Client...")
+        client = AsyncIOMotorClient(f"mongodb+srv://{settings.db_user}:{settings.db_password}@{settings.db_host}/{settings.db_name}")
         await init_beanie(database=client[settings.db_name], document_models=document_models)
     except Exception as e:
         logger.error(f"Failed to initialize MongoDB: {e}")

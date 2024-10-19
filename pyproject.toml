@@ -6,6 +6,10 @@ authors = ["John Kealy <johnckealy.dev@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 package-mode = true
+exclude = [
+    { path = "pyflutterflow/dashboard/node_modules" }
+]
+
 
 [tool.poetry.dependencies]
 python = "^3.12"
