@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '@/stores/auth.store'; // Adjust the path according to your file structure
 
 const api = axios.create({
-  baseURL: ``
+  baseURL: ''
 });
 
 // Request interceptor for API calls

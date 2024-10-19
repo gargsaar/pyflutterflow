@@ -17,7 +17,7 @@ export const useDatabaseEntityStore = defineStore({
     },
 
     async getDatabaseEntityDetail(collectionName, key) {
-      const { data } = await api.get(`${collectionName}/${key}`)
+      const { data } = await api.get(`/${collectionName}/${key}`)
       return data
     },
 
@@ -30,16 +30,16 @@ export const useDatabaseEntityStore = defineStore({
     },
 
     async createDatabaseEntity(collectionName, payload) {
-      await api.post(collectionName, payload)
+      await api.post(`/${collectionName}`, payload)
     },
 
     async updateDatabaseEntity(collectionName, key, payload) {
-      const { data } = await api.patch(`${collectionName}/${key}`, payload)
+      const { data } = await api.patch(`/${collectionName}/${key}`, payload)
       return data
     },
 
     async deleteDatabaseEntity(collectionName, key) {
-      await api.delete(`${collectionName}/${key}`)
+      await api.delete(`/${collectionName}/${key}`)
     },
   },
 })

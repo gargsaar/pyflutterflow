@@ -1,6 +1,4 @@
-import { initializeApp } from "firebase/app";
 import {
-  getAuth,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   GoogleAuthProvider,
@@ -9,45 +7,40 @@ import {
   updateProfile,
   createUserWithEmailAndPassword
 } from "firebase/auth";
+import { useAuthStore } from '@/stores/auth.store';
 
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCe0IOaSV1xAph_B5dvDgQ2LMn7BoBTDEg",
-  authDomain: "appify-d2d36.firebaseapp.com",
-  projectId: "appify-d2d36",
-  storageBucket: "appify-d2d36.appspot.com",
-  messagingSenderId: "641323310392",
-  appId: "1:641323310392:web:09274031a1e2606838f5cd"
-};
-
-const firebaseInit = initializeApp(firebaseConfig);
-const firebaseAuth = getAuth(firebaseInit);
 
 const signInWithFirebase = async (email, password) => {
-  return await signInWithEmailAndPassword(firebaseAuth, email, password);
+  const authStore = useAuthStore();
+  return await signInWithEmailAndPassword(authStore.firebaseAuth, email, password);
 };
 
 const firebaseEmailSignup = async (email, password) => {
-  return await createUserWithEmailAndPassword(firebaseAuth, email, password);
+  const authStore = useAuthStore();
+  return await createUserWithEmailAndPassword(authStore.firebaseAuth, email, password);
 };
 
 const signOutWithFirebase = async () => {
-  return await signOut(firebaseAuth)
+  const authStore = useAuthStore();
+  return await signOut(authStore.firebaseAuth)
 };
 
 const signInWithGoogle =  async() => {
+  const authStore = useAuthStore();
   const provider = new GoogleAuthProvider();
   provider.setCustomParameters({
     prompt: 'select_account'
   });
-  return await signInWithPopup(firebaseAuth, provider);
+  return await signInWithPopup(authStore.firebaseAuth, provider);
 };
 
 const passwordResetEmail = async (email) => {
-  return await sendPasswordResetEmail(firebaseAuth, email);
+  const authStore = useAuthStore();
+  return await sendPasswordResetEmail(authStore.firebaseAuth, email);
 }
 
 const updateProfileWithFirebase = async (user, payload) => {
+  const authStore = useAuthStore();
   return await updateProfile(user, {
     displayName: payload.displayName
   });

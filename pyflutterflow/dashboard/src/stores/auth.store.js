@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { initializeApp } from "firebase/app";
 import {
   getFirebaseErrorMessage,
   signInWithFirebase,
@@ -14,6 +15,8 @@ import api from '@/services/api';
 export const useAuthStore = defineStore({
   id: "auth",
   state: () => ({
+    firebaseApp: null,
+    firebaseAuth: null,
     user: null,
     accessToken: null,
     isCheckingAuth: false,
@@ -38,6 +41,14 @@ export const useAuthStore = defineStore({
   },
 
   actions: {
+
+    async initializeFirebase() {
+      if (!this.firebaseApp) {
+        const { data } = await api.get('/getconf');
+        this.firebaseApp = initializeApp(data.firebase_config);
+        this.firebaseAuth = getAuth(this.firebaseApp);
+      }
+    },
 
     async signIn(email, password) {
       try {
@@ -101,6 +112,8 @@ export const useAuthStore = defineStore({
     },
 
     async checkForAuthenticatedUser() {
+      if (!this.firebaseAuth)
+        await this.initializeFirebase()
       const auth = getAuth();
       this.isCheckingAuth = true;
       return new Promise((resolve) => {
