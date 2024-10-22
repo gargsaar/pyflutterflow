@@ -24,5 +24,6 @@ class PyFlutterflow:
         return self.settings
 
     def dashboard_path(self):
-        with resources.path("pyflutterflow.dashboard", "dist") as static_path:
-            return "/dashboard", StaticFiles(directory=str(static_path), html=True), "vue_app"
+        static_path = resources.files("pyflutterflow.dashboard").joinpath("dist")
+        with resources.as_file(static_path) as path:
+            return "/dashboard", StaticFiles(directory=str(path), html=True), "vue_app"

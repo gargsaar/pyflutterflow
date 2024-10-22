@@ -55,7 +55,7 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
 
 @lru_cache()
-def get_repository(Entity) -> BaseService[ModelType, CreateSchemaType, UpdateSchemaType]:
+def get_repository(Entity) -> MongoRepository | FirestoreRepository:
     read_from, write_to = get_targets('entities')
     if read_from == DBTarget.MONGO and write_to == DBTarget.MONGO:
         repository = MongoRepository(model=Entity)
@@ -63,4 +63,4 @@ def get_repository(Entity) -> BaseService[ModelType, CreateSchemaType, UpdateSch
         repository = FirestoreRepository(model=Entity)
     else:
         repository = get_dual_repository(Entity, read_from, write_to)
-    return BaseService(repository=repository)
+    return repository

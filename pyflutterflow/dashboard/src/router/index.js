@@ -66,7 +66,6 @@ router.beforeEach(async (to, from, next) => {
   if (!authStore.user)
     await authStore.checkForAuthenticatedUser();
 
-
   const requiresEmailVerification = to.matched.some(record => record.meta.requiresVerifiedEmail);
 
   if (requiresEmailVerification && authStore.user && !authStore.user.emailVerified) {

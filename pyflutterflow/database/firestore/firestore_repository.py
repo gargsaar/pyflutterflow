@@ -6,6 +6,7 @@ from pyflutterflow.database.interface import BaseRepositoryInterface
 from pyflutterflow.database import ModelType, CreateSchemaType, UpdateSchemaType
 from pyflutterflow.auth import FirebaseUser
 from pyflutterflow.logs import get_logger
+from pyflutterflow import constants
 
 logger = get_logger(__name__)
 
@@ -14,6 +15,8 @@ class FirestoreRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, U
 
     def __init__(self, model: type[ModelType]):
         self.db = FirestoreClient.get_client()
+        if not model.Settings.name:
+            raise ValueError("Model does not have a Settings class. Collections must be named within a Settings class in the model.")
         self.collection = self.db.collection(model.Settings.name)
         self.model = model
 

@@ -51,7 +51,10 @@ class MongoRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Updat
         document = await self.model.get(id)
         if not document:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Cannot update: Not found")
-        if document.user_id != current_user.uid and current_user.role != constants.ADMIN_ROLE:
+        if current_user.role == constants.ADMIN_ROLE:
+            logger.info(f"Admin user {current_user.uid} is updating record {document.id}")
+            return await document.update({"$set": data.to_dict()})
+        elif document.user_id != current_user.uid and current_user.role != constants.ADMIN_ROLE:
             logger.warning(f"An attempt was made to modify a record not owned by the current user. User: {current_user.uid}, Record: {document.id}")
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="An attempt was made to modify a record not owned by the current user.")
         return await document.update({"$set": data.to_dict()})
@@ -60,6 +63,9 @@ class MongoRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Updat
         document = await self.model.get(id)
         if not document:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Cannot delete: Not found")
+        if current_user.role == constants.ADMIN_ROLE:
+            logger.info(f"Admin user {current_user.uid} is deleting record {document.id}")
+            return await document.delete()
         if document.user_id != current_user.uid and current_user.role != constants.ADMIN_ROLE:
             logger.warning(f"An attempt was made to delete a record not owned by the current user. User: {current_user.uid}, Record: {document.id}")
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="An attempt was made to delete a record not owned by the current user.")
