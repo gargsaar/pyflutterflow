@@ -6,7 +6,7 @@
             </router-link>
         </h1>
         <div>
-            <ul v-if="databaseEntityIndex && schema.fields && databaseEntityIndex.length > 0" >
+            <ul v-if="databaseEntityIndex && schema.fields && databaseEntityIndex.items.length > 0" >
                 <li v-for="databaseEntity in databaseEntityIndex.items" :key="databaseEntity.id">
                     <router-link class="w-full outline" :to="`/${route.params.entity}/${databaseEntity.id}`">
                         <div class="outline outline-1 outline-surface-200 rounded-lg shadow p-3 my-3 hover:shadow-lg">

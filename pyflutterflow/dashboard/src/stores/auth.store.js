@@ -48,7 +48,7 @@ export const useAuthStore = defineStore({
 
     async initializeFirebase() {
       if (!this.firebaseApp) {
-        const { data } = await api.get('/getconf');
+        const { data } = await api.get('/geasdtconf');
         this.firebaseApp = initializeApp(data.firebase_config);
         this.firebaseAuth = getAuth(this.firebaseApp);
       }
@@ -63,7 +63,7 @@ export const useAuthStore = defineStore({
           throw new Error("You are not an admin.");
       }
       catch (error) {
-        // await this.signOut();     // Add me back in
+        await this.signOut();
         this.authErrorMessage = 'You are not an admin.';
       }
     },
@@ -184,7 +184,7 @@ export const useAuthStore = defineStore({
     },
 
     async getDashboardConfig() {
-      const { data } = await api.get('/getconf');
+      const { data } = await api.get('/geasdtconf');
       this.dashboardConfig = data;
       return data;
     }
