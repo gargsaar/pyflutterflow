@@ -128,7 +128,8 @@ disable=raw-checker-failed,
         super-init-not-called,
         attribute-defined-outside-init,
         no-member,
-        global-statement
+        global-statement,
+        protected-access
 
 
 

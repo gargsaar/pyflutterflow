@@ -64,6 +64,8 @@ const getFirebaseErrorMessage = (firebaseMessage) => {
       return "This email address already in use";
     case "auth/too-many-requests":
       return "You have attempted this too many times in a short period of time. Please try again later.";
+    case "auth/not-admin":
+      return "You are not an admin";
     default:
       return "There was a problem processing the request";
   }

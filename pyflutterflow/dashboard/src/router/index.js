@@ -1,12 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store';
-import HomeView from '@/views/HomeView.vue'
-import DatabaseEntityIndex from '@/views/DatabaseEntityIndex.vue'
-import DatabaseEntityDetail from '@/views/DatabaseEntityDetail.vue'
-import ProfileView from '@/views/AuthViews/ProfileView.vue'
-import LoginView from '@/views/AuthViews/LoginView.vue'
-import SignupView from '@/views/AuthViews/SignupView.vue'
-import NotFound404 from '@/views/NotFound404.vue'
+import HomeView from '@/views/HomeView.vue';
+import DatabaseEntityIndex from '@/views/DatabaseEntityIndex.vue';
+import DatabaseEntityDetail from '@/views/DatabaseEntityDetail.vue';
+import UserIndex from '@/views/UserIndex.vue';
+import ProfileView from '@/views/AuthViews/ProfileView.vue';
+import LoginView from '@/views/AuthViews/LoginView.vue';
+import SignupView from '@/views/AuthViews/SignupView.vue';
+import NotFound404 from '@/views/NotFound404.vue';
 
 const router = createRouter({
   history: createWebHistory('/dashboard'),
@@ -16,6 +17,12 @@ const router = createRouter({
       name: 'HomeView',
       component: HomeView,
       meta: { requiresAuth: true, requiresVerifiedEmail: true},
+    },
+    {
+      path: '/users',
+      name: 'UserIndex',
+      component: UserIndex,
+      meta: { requiresAuth: true },
     },
     {
       path: '/:entity',

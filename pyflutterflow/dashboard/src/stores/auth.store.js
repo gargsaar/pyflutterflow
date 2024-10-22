@@ -22,7 +22,8 @@ export const useAuthStore = defineStore({
     isCheckingAuth: false,
     authErrorMessage: null,
     showEmailVerificationModal: false,
-    dashboardConfig: {}
+    dashboardConfig: {},
+    role: null
   }),
 
   getters: {
@@ -38,6 +39,9 @@ export const useAuthStore = defineStore({
     dateCreated: (state) => {
       return new Date(state.user.metadata.creationTime);
     },
+    isAdmin: (state) => {
+      return state.role === 'admin';
+    }
   },
 
   actions: {
@@ -54,10 +58,19 @@ export const useAuthStore = defineStore({
       try {
         const userCredential = await signInWithFirebase(email, password);
         await this.setUser(userCredential.user);
+        await this.setRole();
+        if (!this.isAdmin)
+          throw new Error("You are not an admin.");
       }
       catch (error) {
-        this.authErrorMessage = getFirebaseErrorMessage(error.code);
+        // await this.signOut();     // Add me back in
+        this.authErrorMessage = 'You are not an admin.';
       }
+    },
+
+    async setRole() {
+      const idTokenResult = await this.user.getIdTokenResult();
+      this.role = idTokenResult?.claims?.role;
     },
 
     async emailSignUp(email, password) {
@@ -94,11 +107,19 @@ export const useAuthStore = defineStore({
         const response = await signInWithGoogle();
         console.log("Login via Google was successful  😃");
         await this.setUser(response.user);
+        await this.setRole();
+        if (!this.isAdmin) {
+          const error = new Error("You are not an admin.");
+          error.code = 'auth/not-admin';
+          throw error;
+        }
       }
       catch (error) {
         this.authErrorMessage = getFirebaseErrorMessage(error.code);
-        console.error('Sign-in error:', error.message);}
+        await this.signOut();
+      }
     },
+
 
     async passwordReset(email) {
       try {

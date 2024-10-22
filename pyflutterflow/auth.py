@@ -28,9 +28,19 @@ class FirebaseUser(BaseModel):
     role: str = "user"
 
 
+class FirebaseAuthUser(BaseModel):
+    uid: str
+    email: str
+    display_name: str | None = None
+    photo_url: str | None = None
+    last_login_at: str
+    created_at: str
+    custom_attributes: str | None = None
+
+
 class FirebaseUserClaims(BaseModel):
     uid: str
-    role: str
+    role: str = 'admin'
 
 
 async def get_admin_user(token: HTTPAuthorizationCredentials = Depends(security)) -> FirebaseUser:
@@ -56,11 +66,32 @@ async def get_current_user(token: HTTPAuthorizationCredentials = Depends(securit
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
 
 
+async def get_users_list(_: FirebaseUser = Depends(get_admin_user)) -> FirebaseUser:
+    """Get a list of all users in the firebase auth system."""
+    try:
+        users = auth.list_users(max_results=500)
+        users_list = []
+        for user in users.iterate_all():
+            data = user._data
+            users_list.append(FirebaseAuthUser(
+                uid=data.get('localId'),
+                email=data.get('email'),
+                display_name=data.get('displayName'),
+                photo_url=data.get('photoUrl'),
+                last_login_at=data.get('lastLoginAt'),
+                created_at=data.get('createdAt'),
+                custom_attributes=data.get('customAttributes'),
+            ))
+        return users_list
+    except Exception as e:
+        logger.error("Error encountered during getting users list: %s", e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Error encountered while getting users list.')
+
+
 async def set_user_role(user_claim: FirebaseUserClaims, user: FirebaseUser = Depends(get_admin_user)) -> None:
     """Update the service role permissions on the desired firebase user account. Take care: this action can create an admin."""
     if user.role != constants.ADMIN_ROLE:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User does not have permission to set user role.")
-
     try:
         logger.info("Setting user role: %s for user: %s", user_claim.role, user_claim.uid)
         auth.set_custom_user_claims(user_claim.uid, {'role': user_claim.role})
