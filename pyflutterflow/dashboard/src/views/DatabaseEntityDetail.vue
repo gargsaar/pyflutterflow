@@ -43,15 +43,15 @@ onMounted(async() => {
 })
 
 const handleSave = async() => {
-    await databaseEntityStore.upsertDatabaseEntity(route.params.entity, route.params.id, data.value)
+    const toastResponse = await databaseEntityStore.upsertDatabaseEntity(route.params.entity, route.params.id, data.value)
     if (route.params.id === 'create')
         router.push(`/${route.params.entity}`)
-    toast.add({ severity: 'success', summary: "Document updated", detail: `The database entry was saved successfully`, life: 3000 });
+    toast.add(toastResponse);
 }
 
 const handleDelete = async() => {
-    await databaseEntityStore.deleteDatabaseEntity(route.params.entity, route.params.id)
-    toast.add({ severity: 'success', summary: "Document removed", detail: `The database entry was deleted successfully`, life: 3000 });
+    const toastResponse = await databaseEntityStore.deleteDatabaseEntity(route.params.entity, route.params.id)
+    toast.add(toastResponse);
     router.push(`/${route.params.entity}`)
 }
 

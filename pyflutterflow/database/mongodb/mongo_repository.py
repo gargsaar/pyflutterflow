@@ -34,6 +34,9 @@ class MongoRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Updat
         document = await self.model.get(id)
         if not document:
             raise ValueError("Cannot retrieve MongoDB document: Not found")
+        if current_user.role == constants.ADMIN_ROLE:
+            logger.info(f"Admin user is fetching record {document.id}")
+            return document
         if document.user_id != current_user.uid and current_user.role != constants.ADMIN_ROLE:
             logger.warning(f"An attempt was made to retrieve a record not owned by the current user. User: {current_user.uid}, Record: {document.id}")
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="You are not allowed to access this record.")

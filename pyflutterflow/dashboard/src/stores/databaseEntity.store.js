@@ -17,7 +17,7 @@ export const useDatabaseEntityStore = defineStore({
     },
 
     async getDatabaseEntityDetail(collectionName, key) {
-      const { data } = await api.get(`/admin${collectionName}/${key}`)
+      const { data } = await api.get(`/admin/${collectionName}/${key}`)
       return data
     },
 
@@ -30,16 +30,33 @@ export const useDatabaseEntityStore = defineStore({
     },
 
     async createDatabaseEntity(collectionName, payload) {
-      await api.post(`/admin${collectionName}`, payload)
+      try {
+        await api.post(`/admin/${collectionName}`, payload)
+        return { severity: 'success', summary: "Document created", detail: `The database entry was created successfully`, life: 3000 }
+      }
+      catch (error) {
+        return { severity: 'error', summary: "Document not created", detail: error, life: 3000 }
+      }
     },
 
     async updateDatabaseEntity(collectionName, key, payload) {
-      const { data } = await api.patch(`/admin${collectionName}/${key}`, payload)
-      return data
+      try {
+        await api.patch(`/admin/${collectionName}/${key}`, payload)
+        return { severity: 'success', summary: "Document updated", detail: `The database entry was saved successfully`, life: 3000 }
+      }
+      catch (error) {
+        return { severity: 'error', summary: "Document not updated", detail: error, life: 3000 }
+      }
     },
 
     async deleteDatabaseEntity(collectionName, key) {
-      await api.delete(`/admin${collectionName}/${key}`)
+      try {
+        await api.delete(`/admin/${collectionName}/${key}`)
+        return { severity: 'success', summary: "Document removed", detail: `The database entry was deleted successfully`, life: 3000 }
+      }
+      catch (error) {
+        return { severity: 'error', summary: "Document not removed", detail: error, life: 3000 }
+      }
     },
   },
 })
