@@ -14,8 +14,15 @@
                 <li v-for="databaseEntity in databaseEntityIndex.items" :key="databaseEntity.id">
                     <router-link class="w-full outline" :to="`/${route.params.entity}/${databaseEntity.id}`">
                         <div class="outline outline-1 outline-surface-200 rounded-lg shadow p-3 my-3 hover:shadow-lg">
-                            {{ databaseEntity[schema.fields[0].fieldName] }}
+                            <span v-if="schema.fields[0].type === 'Date'">
+                                {{ formatDate(databaseEntity[schema.fields[0].fieldName]) }}
+                            </span>
+                            <span v-else>
+                                {{ databaseEntity[schema.fields[0].fieldName] }}
+                            </span>
                         </div>
+                        <div v-if="schema.fields[0].type === 'Date' && formatDate(databaseEntity[schema.fields[0].fieldName]).includes('Friday')"
+                            class="mb-20" />
                     </router-link>
                 </li>
             </ul>
@@ -35,6 +42,7 @@ import { onMounted, computed, ref } from 'vue';
 import { useDatabaseEntityStore } from '@/stores/databaseEntity.store';
 import Button from 'primevue/button';
 import { useAuthStore } from '@/stores/auth.store';
+import { format } from 'date-fns';
 
 const authStore = useAuthStore();
 const route = useRoute();
@@ -49,6 +57,10 @@ onMounted(async () => {
     await databaseEntityStore.getDatabaseEntityIndex(route.path, 1, 100)
 })
 
+const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    return format(new Date(dateStr), 'EEEE, d MMMM yyyy');
+}
 
 databaseEntityStore.getDatabaseEntityIndex(route.path, 1, 100)
 
