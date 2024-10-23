@@ -17,7 +17,7 @@ class BaseRepositoryInterface(ABC, Generic[ModelType, CreateSchemaType, UpdateSc
     async def list(self, params: Params, current_user: FirebaseUser) -> Page[ModelType]:
         pass
 
-    async def list_all(self, params: Params, current_user: FirebaseUser) -> Page[ModelType]:
+    async def list_all(self, params: Params, sort: str, current_user: FirebaseUser) -> Page[ModelType]:
         pass
 
     @abstractmethod

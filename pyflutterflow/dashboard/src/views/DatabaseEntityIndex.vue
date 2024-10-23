@@ -1,12 +1,16 @@
 <template>
     <div v-if="!!schema && !!databaseEntityIndex">
-        <h1 class="text-xl my-6">{{ schema.display_name }} collection
-            <router-link :to="`/${route.params.entity}/create`">
+        <h1 class="text-xl flex items-center my-6">
+            {{ schema.display_name }} collection
+            <span class="px-2 text-surface-400">
+                ({{ databaseEntityIndex.items.length }})
+            </span>
+            <router-link v-if="!schema.read_only" :to="`/${route.params.entity}/create`">
                 <Button icon="fa-solid fa-plus text-green-600" text />
             </router-link>
         </h1>
         <div>
-            <ul v-if="databaseEntityIndex && schema.fields && databaseEntityIndex.items.length > 0" >
+            <ul v-if="databaseEntityIndex && schema.fields && databaseEntityIndex.items.length > 0">
                 <li v-for="databaseEntity in databaseEntityIndex.items" :key="databaseEntity.id">
                     <router-link class="w-full outline" :to="`/${route.params.entity}/${databaseEntity.id}`">
                         <div class="outline outline-1 outline-surface-200 rounded-lg shadow p-3 my-3 hover:shadow-lg">

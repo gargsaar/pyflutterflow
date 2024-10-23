@@ -5,6 +5,7 @@ from pyflutterflow import PyFlutterflow
 
 logger = get_logger(__name__)
 
+
 class FirestoreClient:
     """
     Singleton class to manage a single instance of the Firestore AsyncClient.

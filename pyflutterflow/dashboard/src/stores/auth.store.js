@@ -48,7 +48,7 @@ export const useAuthStore = defineStore({
 
     async initializeFirebase() {
       if (!this.firebaseApp) {
-        const { data } = await api.get('/geasdtconf');
+        const { data } = await api.get('/configure');
         this.firebaseApp = initializeApp(data.firebase_config);
         this.firebaseAuth = getAuth(this.firebaseApp);
       }
@@ -184,7 +184,7 @@ export const useAuthStore = defineStore({
     },
 
     async getDashboardConfig() {
-      const { data } = await api.get('/geasdtconf');
+      const { data } = await api.get('/configure');
       this.dashboardConfig = data;
       return data;
     }

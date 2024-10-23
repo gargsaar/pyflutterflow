@@ -11,7 +11,7 @@ router = APIRouter(
 )
 
 
-@router.get("/geasdtconf")
+@router.get("/configure")
 async def serve_vue_config():
     file_path = "admin_config.json"
     return FileResponse(file_path)

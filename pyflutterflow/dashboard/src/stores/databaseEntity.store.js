@@ -22,6 +22,10 @@ export const useDatabaseEntityStore = defineStore({
     },
 
     async upsertDatabaseEntity(collectionName, key, payload) {
+      Object.keys(payload).forEach(key => {
+        if (payload[key] instanceof Date)
+            payload[key] = payload[key].toISOString().split('T')[0];
+      });
       if (key === 'create') {
         return this.createDatabaseEntity(collectionName, payload)
       } else {
@@ -35,7 +39,7 @@ export const useDatabaseEntityStore = defineStore({
         return { severity: 'success', summary: "Document created", detail: `The database entry was created successfully`, life: 3000 }
       }
       catch (error) {
-        return { severity: 'error', summary: "Document not created", detail: error, life: 3000 }
+        return { severity: 'error', summary: "Document not created", detail: error.response.data.detail, life: 3000 }
       }
     },
 
@@ -45,7 +49,7 @@ export const useDatabaseEntityStore = defineStore({
         return { severity: 'success', summary: "Document updated", detail: `The database entry was saved successfully`, life: 3000 }
       }
       catch (error) {
-        return { severity: 'error', summary: "Document not updated", detail: error, life: 3000 }
+        return { severity: 'error', summary: "Document not updated", detail: error.response.data.detail, life: 3000 }
       }
     },
 
@@ -55,7 +59,7 @@ export const useDatabaseEntityStore = defineStore({
         return { severity: 'success', summary: "Document removed", detail: `The database entry was deleted successfully`, life: 3000 }
       }
       catch (error) {
-        return { severity: 'error', summary: "Document not removed", detail: error, life: 3000 }
+        return { severity: 'error', summary: "Document not removed", detail: error.response.data.detail, life: 3000 }
       }
     },
   },

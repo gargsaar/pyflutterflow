@@ -1,7 +1,7 @@
 <template>
   <Menu v-if="authStore.user" :model="menuItems" :pt="sideNavStyles">
     <template #item="{ item, props }">
-      <router-link :to="`/${item.collection_name}`" v-bind="props.action" class="!my-0 !py-4 flex gap-4"
+      <router-link  @click="sideBarVisible = false" :to="`/${item.collection_name}`" v-bind="props.action" class="!my-0 !py-4 flex gap-4"
         :class="`/${item.collection_name}` == route.path ? 'bg-surface-700' : ''">
         <i class="fa-solid fa-database"></i>
         <span v-bind="props.label">{{ item.display_name }} </span>
@@ -9,9 +9,9 @@
     </template>
   </Menu>
 
-  <router-link :to="`/users`" class="!m-1 !px-3 !my-12 !py-3 flex gap-4 items-center" :class="`/users` == route.path ? 'bg-surface-700' : ''">
-    <i class="fa-solid fa-users"></i>
-    <span v-bind="props.label">Users</span>
+  <router-link @click="sideBarVisible = false" :to="`/users`" class="!m-1 !px-3 !my-12 !py-3 flex gap-4 items-center" :class="`/users` == route.path ? 'bg-surface-700' : ''">
+    <i class="fa-solid text-surface-0 fa-users"></i>
+    <span class="text-surface-0" v-bind="props.label">Users</span>
   </router-link>
 
   <LoadingIndicators />

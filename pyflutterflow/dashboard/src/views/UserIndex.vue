@@ -1,10 +1,6 @@
 <template>
   <div v-if="!!users">
-      <h1 class="text-xl my-6">Users
-          <!-- <router-link :to="`/`">
-              <Button icon="fa-solid fa-plus text-green-600" text />
-          </router-link> -->
-      </h1>
+      <h1 class="text-xl my-6">Users</h1>
       <div>
           <ul v-if="users && users.length > 0" >
               <li v-for="user in users" :key="user.uid">
@@ -16,6 +12,10 @@
                   </router-link>
               </li>
           </ul>
+
+          <div v-else-if="userStore.isLoading">
+            <ProgressSpinner style="width: 60px; height: 60px" strokeWidth="5"  />
+          </div>
 
           <div class="text-surface-500" v-else>
               <p>No items</p>
@@ -29,6 +29,8 @@
 
 import { ref, computed } from 'vue'
 import { useUserStore } from '@/stores/user.store'
+import ProgressSpinner from 'primevue/progressspinner';
+
 
 const userStore = useUserStore();
 

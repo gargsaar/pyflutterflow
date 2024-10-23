@@ -3,12 +3,12 @@
   <div class="flex h-screen antialiased">
 
     <div class="md:hidden w-full ">
-      <Sidebar v-model:visible="visible">
+      <Drawer v-model:visible="visible">
         <template #header>
           <img src="@/assets/images/logo.png" alt="logo image" class="w-12 dark:invert rounded" />
         </template>
         <Sidenav v-model="visible" />
-      </Sidebar>
+      </Drawer>
       <div class="flex justify-between items-center">
         <Button icon="fa-solid fa-bars" class="m-3 " text size="large" @click="visible = true" severity="secondary" rounded
         aria-label="menu" />
@@ -52,7 +52,8 @@
 
 <script setup>
 import Sidenav from '@/components/layout/Sidenav.vue';
-import Sidebar from 'primevue/sidebar';
+import Drawer from 'primevue/drawer';
+
 import Button from 'primevue/button';
 import Navbar from '@/components/layout/Navbar.vue';
 import { ref } from 'vue';
