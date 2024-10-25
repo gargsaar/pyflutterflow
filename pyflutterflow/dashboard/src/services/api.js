@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { useAuthStore } from '@/stores/auth.store'; // Adjust the path according to your file structure
 
+// Create an instance of axios
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || ''
+  baseURL: import.meta.env.DEV ? import.meta.env.VITE_API_URL : ''
 });
 
 // Request interceptor for API calls
