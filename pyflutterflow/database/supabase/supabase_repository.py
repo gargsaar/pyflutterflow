@@ -1,5 +1,5 @@
 from typing import Generic
-from beanie import PydanticObjectId
+from cachetools import TTLCache
 from fastapi_pagination import Params, Page
 from pyflutterflow.database.supabase.supabase_client import SupabaseClient
 from pyflutterflow.database.interface import BaseRepositoryInterface
@@ -9,6 +9,9 @@ from pyflutterflow.logs import get_logger
 from pyflutterflow import constants
 
 logger = get_logger(__name__)
+
+token_cache = TTLCache(maxsize=100, ttl=300)
+
 
 class SupabaseRepository(
     BaseRepositoryInterface[ModelType, CreateSchemaType, UpdateSchemaType],
@@ -21,6 +24,8 @@ class SupabaseRepository(
                 "Model does not have a Settings class. Tables must be named within a Settings class in the model."
             )
         self.table_name = model.Settings.name
+        self.supabase = SupabaseClient()
+        self.client = None
 
     async def list(self, params: Params, current_user: FirebaseUser) -> Page[ModelType]:
         """
@@ -33,11 +38,12 @@ class SupabaseRepository(
         Returns:
             Page[ModelType]: A paginated list of records.
         """
-        db = await SupabaseClient.get_client()
+        self.client = await self.supabase.get_client()
+
         start = (params.page - 1) * params.size
         end = start + params.size - 1
         response = (
-            await db.from_(self.table_name)
+            await self.client.from_(self.table_name)
             .select("*")
             .eq("user_id", current_user.uid)
             .range(start, end)
@@ -46,7 +52,7 @@ class SupabaseRepository(
         if response.error:
             raise ValueError(response.error.message)
         total_response = (
-            await db.from_(self.table_name)
+            await self.client.from_(self.table_name)
             .select("id", count="exact")
             .eq("user_id", current_user.uid)
             .execute()
@@ -56,7 +62,7 @@ class SupabaseRepository(
         return Page.create(items=items, total=total, params=params)
 
     async def list_all(
-        self, params: Params, sort: str, current_user: FirebaseUser
+        self, params: Params, current_user: FirebaseUser, **kwargs
     ) -> Page[ModelType]:
         """
         Retrieves a paginated and sorted list of all records for the current user.
@@ -69,29 +75,33 @@ class SupabaseRepository(
         Returns:
             Page[ModelType]: A paginated and sorted list of records.
         """
-        db = await SupabaseClient.get_client()
+        user_id = current_user.uid
+
+        # Generate JWT token for the user
+        if user_id in token_cache:
+            jwt_token = token_cache[user_id]
+        else:
+            jwt_token = await self.supabase.generate_jwt(user_id)
+            token_cache[user_id] = jwt_token
+
+        # Set the authorization header for the request
+        headers = {
+            'Authorization': f'Bearer {jwt_token}',
+        }
+
         start = (params.page - 1) * params.size
         end = start + params.size - 1
         query = (
-            db.from_(self.table_name)
-            .select("*")
-            .eq("user_id", current_user.uid)
+            self.client.from_(self.table_name)
+            .select("*", count="exact")
             .range(start, end)
         )
-        if sort:
-            query = query.order(sort)
+        if kwargs.get("sort_by"):
+            query = query.order(kwargs.get("sort_by"))
+        query.headers.update(headers)
         response = await query.execute()
-        if response.error:
-            raise ValueError(response.error.message)
-        total_response = (
-            await db.from_(self.table_name)
-            .select("id", count="exact")
-            .eq("user_id", current_user.uid)
-            .execute()
-        )
-        total = total_response.count or 0
         items = [self.model(**item) for item in response.data]
-        return Page.create(items=items, total=total, params=params)
+        return Page.create(items=items, total=response.count, params=params)
 
     async def get(self, id: str, current_user: FirebaseUser) -> ModelType:
         """
@@ -107,9 +117,8 @@ class SupabaseRepository(
         Raises:
             ValueError: If the record does not exist or the user lacks privileges.
         """
-        db = await SupabaseClient.get_client()
         response = (
-            await db.from_(self.table_name).select("*").eq("id", id).execute()
+            await self.client.from_(self.table_name).select("*").eq("id", id).execute()
         )
         if response.error:
             raise ValueError(response.error.message)
@@ -139,12 +148,11 @@ class SupabaseRepository(
         Returns:
             ModelType: The created record.
         """
-        db = await SupabaseClient.get_client()
         data_dict = data.dict()
         data_dict["user_id"] = current_user.uid
         data_dict["id"] = kwargs.get("id", str(PydanticObjectId()))
         serialized_data = data.model_dump(mode='json')
-        response = await db.from_(self.table_name).insert(serialized_data).execute()
+        response = await self.client.from_(self.table_name).insert(serialized_data).execute()
         return self.model(**response.data[0])
 
     async def update(
@@ -161,10 +169,9 @@ class SupabaseRepository(
         Returns:
             ModelType: The updated record.
         """
-        db = await SupabaseClient.get_client()
         data_dict = data.dict(exclude_unset=True)
         response = (
-            await db.from_(self.table_name)
+            await self.client.from_(self.table_name)
             .update(data_dict)
             .eq("id", id)
             .execute()
@@ -181,9 +188,8 @@ class SupabaseRepository(
             id (str): The ID of the record to delete.
             current_user (FirebaseUser): The current authenticated user.
         """
-        db = await SupabaseClient.get_client()
         response = (
-            await db.from_(self.table_name).delete().eq("id", id).execute()
+            await self.client.from_(self.table_name).delete().eq("id", id).execute()
         )
         if response.error:
             raise ValueError(response.error.message)

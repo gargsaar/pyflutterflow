@@ -1,6 +1,8 @@
-from supabase._async.client import AsyncClient, create_client
+from datetime import datetime, timedelta, timezone
+import jwt
 from pyflutterflow.logs import get_logger
 from pyflutterflow import PyFlutterflow
+from supabase._async.client import AsyncClient, create_client
 
 logger = get_logger(__name__)
 
@@ -10,66 +12,90 @@ class SupabaseClient:
     Singleton class to manage a single instance of the Supabase Client.
 
     This class ensures that only one instance of the Supabase client exists throughout
-    the application's lifecycle. It provides class methods to set, retrieve, and close
+    the application's lifecycle. It provides methods to initialize, retrieve, and close
     the Supabase client, facilitating centralized management of Supabase interactions.
-
-    Attributes:
-        _client (Optional[AsyncClient]): The singleton instance of the Supabase Client.
     """
 
-    _client: AsyncClient | None = None
+    _instance = None
 
-    @classmethod
-    async def init(cls) -> None:
-        settings = PyFlutterflow().get_environment()
-        supabase_url = settings.supabase_url
-        supabase_key = settings.supabase_key
-        supabase_client = await create_client(supabase_url, supabase_key)
-        await cls.set_client(supabase_client)
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(SupabaseClient, cls).__new__(cls)
+        return cls._instance
 
-    @classmethod
-    async def set_client(cls, client: AsyncClient) -> None:
+    def __init__(self):
+        """Initialize environment settings and placeholders for Supabase client."""
+        if not hasattr(self, '_initialized'):  # Prevent reinitialization on multiple calls
+            settings = PyFlutterflow().get_environment()
+            self.supabase_url = settings.supabase_url
+            self.supabase_key = settings.supabase_key
+            self.supabase_jwt_secret = settings.supabase_jwt_secret
+            self._client: AsyncClient | None = None
+            self._initialized = True  # Flag to indicate instance has been initialized
+
+    async def initialize_client(self) -> None:
         """
-        Sets the singleton Supabase Client instance.
-
-        Args:
-            client (Client): An instance of Supabase Client to be used as the singleton.
-
-        Raises:
-            ValueError: If an attempt is made to set the client when it's already initialized.
+        Initializes the Supabase Client instance asynchronously.
         """
-        cls._client = client
+        if self._client is None:
+            self._client = await create_client(self.supabase_url, self.supabase_key)
+            logger.info("Supabase Client initialized.")
 
-    @classmethod
-    async def get_client(cls) -> AsyncClient:
+    async def get_client(self) -> AsyncClient:
         """
-        Retrieves the singleton Supabase Client instance.
+        Retrieves the Supabase Client instance.
 
         Returns:
-            Client: The initialized Supabase Client instance.
+            AsyncClient: The initialized Supabase Client instance.
 
         Raises:
             ValueError: If the Supabase client has not been initialized.
         """
-        if cls._client is None:
-            cls.init()
-            logger.info("Initializing Supabase Client...")
-        return cls._client
+        if self._client is None:
+            await self.initialize_client()
+        return self._client
 
-    @classmethod
-    async def close_client(cls) -> None:
+    async def generate_jwt(self, member_id):
         """
-        Closes the singleton Supabase Client instance.
+        Generates a JWT token for Supabase authentication.
 
-        This method gracefully closes the Supabase client, ensuring that all pending
-        operations are completed and resources are released. After closing, the client
-        instance is set to `None`, allowing for re-initialization if necessary.
+        Args:
+            user_id: The user ID for which to generate the token.
 
-        Raises:
-            ValueError: If the Supabase client has not been initialized.
-            Exception: Propagates any exceptions raised during the closing of the client.
+        Returns:
+            str: The generated JWT token.
         """
-        if cls._client is None:
+        payload = {
+            "sub": member_id,
+            "member_id": member_id,
+            "iss": "supabase",
+            "ref": "anjaiogkrejqwnisriqt",
+            "role": "authenticated",
+            "iat": int((datetime.now(timezone.utc)).timestamp()),
+            "exp": int((datetime.now(timezone.utc) + timedelta(days=30)).timestamp()),
+        }
+        token = jwt.encode(payload, self.supabase_jwt_secret, algorithm='HS256')
+        return token
+
+    async def close_client(self) -> None:
+        """
+        Closes the Supabase Client instance.
+
+        This method gracefully resets the Supabase client, allowing for re-initialization if necessary.
+        """
+        if self._client is None:
             raise ValueError("Supabase client has not been initialized.")
-        # Supabase client does not require a close operation; reset the client to None
-        cls._client = None
+        self._client = None
+        logger.info("Supabase Client closed.")
+
+    # @classmethod
+    # def instance(cls):
+    #     """
+    #     Provides access to the singleton instance of the SupabaseClient.
+
+    #     Returns:
+    #         SupabaseClient: The singleton instance.
+    #     """
+    #     if cls._instance is None:
+    #         cls._instance = cls()
+    #     return cls._instance

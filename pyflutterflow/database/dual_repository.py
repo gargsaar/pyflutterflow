@@ -27,7 +27,7 @@ class DualRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Update
             return await self.firestore.list(params, current_user)
         return await self.mongo.list(params, current_user)
 
-    async def list_all(self, params: Params, current_user: FirebaseUser) -> Page[ModelType]:
+    async def list_all(self, params: Params, current_user: FirebaseUser, **kwargs) -> Page[ModelType]:
         if self.read_from == DBTarget.FIRESTORE:
             return await self.firestore.list(params, current_user)
         return await self.mongo.list(params, current_user)

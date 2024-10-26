@@ -63,7 +63,7 @@ persistent=yes
 
 # Minimum Python version to use for version dependent checks. Will default to
 # the version used to run pylint.
-py-version=3.11
+py-version=3.12
 
 # When enabled, pylint would attempt to guess common misconfiguration and emit
 # user-friendly hints instead of false-positive error messages.
@@ -108,7 +108,7 @@ disable=raw-checker-failed,
         line-too-long,
         too-many-ancestors,
         import-outside-toplevel,
-      ;   f-string-without-interpolation,
+        f-string-without-interpolation,
 
         # These are fields we would like to include in the lint eventually.
         # There are a lot, but we want as many as we can to added back in!

@@ -23,7 +23,7 @@ class FirestoreRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, U
     async def list(self, params: Params, current_user: FirebaseUser) -> Page[ModelType]:
         raise NotImplementedError("Firestore paginated lists are not yet available in this Python API")
 
-    async def list_all(self, params: Params, sort: str, current_user: FirebaseUser) -> Page[ModelType]:
+    async def list_all(self, params: Params, current_user: FirebaseUser, **kwargs) -> Page[ModelType]:
         raise NotImplementedError("Firestore paginated lists are not yet available in this Python API")
 
     async def get(self, id: str, current_user: FirebaseUser) -> ModelType:

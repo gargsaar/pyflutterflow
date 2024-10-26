@@ -23,8 +23,8 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     async def list(self, params: Params = Depends(), current_user: FirebaseUser = Depends(get_current_user)) -> Page[ModelType]:
         return await self.repository.list(params, current_user)
 
-    async def list_all(self, params: Params = Depends(), sort: str = "-created_at_utc", current_user: FirebaseUser = Depends(get_admin_user)) -> Page[ModelType]:
-        return await self.repository.list_all(params, sort, current_user)
+    async def list_all(self, params: Params = Depends(), current_user: FirebaseUser = Depends(get_admin_user), **kwargs) -> Page[ModelType]:
+        return await self.repository.list_all(params, current_user, **kwargs)
 
     async def get(self, id: str, current_user: FirebaseUser = Depends(get_current_user)) -> ModelType:
         try:
