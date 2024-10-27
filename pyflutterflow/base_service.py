@@ -26,9 +26,9 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     async def list_all(self, params: Params = Depends(), current_user: FirebaseUser = Depends(get_admin_user), **kwargs) -> Page[ModelType]:
         return await self.repository.list_all(params, current_user, **kwargs)
 
-    async def get(self, id: str, current_user: FirebaseUser = Depends(get_current_user)) -> ModelType:
+    async def get(self, pk: str, current_user: FirebaseUser = Depends(get_current_user)) -> ModelType:
         try:
-            return await self.repository.get(id, current_user)
+            return await self.repository.get(pk, current_user)
         except ValueError:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record not found")
 
@@ -39,16 +39,16 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             logger.error(f"Error creating record: {e}")
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to create record")
 
-    async def update(self, id: str, data: UpdateSchemaType, current_user: FirebaseUser = Depends(get_current_user)) -> ModelType:
+    async def update(self, pk: int, data: UpdateSchemaType, current_user: FirebaseUser = Depends(get_current_user)) -> ModelType:
         try:
-            return await self.repository.update(id, data, current_user)
+            return await self.repository.update(pk, data, current_user)
         except Exception as e:
             logger.error(f"Error updating record: {e}")
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to update record")
 
-    async def delete(self, id: str, current_user: FirebaseUser = Depends(get_current_user)) -> None:
+    async def delete(self, pk: int, current_user: FirebaseUser = Depends(get_current_user)) -> None:
         try:
-            return await self.repository.delete(id, current_user)
+            return await self.repository.delete(pk, current_user)
         except Exception as e:
             logger.error(f"Error deleting record: {e}")
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to delete record")

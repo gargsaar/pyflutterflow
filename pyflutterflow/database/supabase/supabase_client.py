@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta, timezone
 import jwt
+from supabase._async.client import AsyncClient, create_client
 from pyflutterflow.logs import get_logger
 from pyflutterflow import PyFlutterflow
-from supabase._async.client import AsyncClient, create_client
 
 logger = get_logger(__name__)
 
@@ -55,7 +55,7 @@ class SupabaseClient:
             await self.initialize_client()
         return self._client
 
-    async def generate_jwt(self, member_id):
+    def generate_jwt(self, member_id):
         """
         Generates a JWT token for Supabase authentication.
 
@@ -87,15 +87,3 @@ class SupabaseClient:
             raise ValueError("Supabase client has not been initialized.")
         self._client = None
         logger.info("Supabase Client closed.")
-
-    # @classmethod
-    # def instance(cls):
-    #     """
-    #     Provides access to the singleton instance of the SupabaseClient.
-
-    #     Returns:
-    #         SupabaseClient: The singleton instance.
-    #     """
-    #     if cls._instance is None:
-    #         cls._instance = cls()
-    #     return cls._instance

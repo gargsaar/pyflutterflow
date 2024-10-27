@@ -21,7 +21,7 @@ class BaseRepositoryInterface(ABC, Generic[ModelType, CreateSchemaType, UpdateSc
         pass
 
     @abstractmethod
-    async def get(self, id: str, current_user: FirebaseUser) -> ModelType:
+    async def get(self, pk: int | str, current_user: FirebaseUser) -> ModelType:
         pass
 
     @abstractmethod
@@ -29,11 +29,11 @@ class BaseRepositoryInterface(ABC, Generic[ModelType, CreateSchemaType, UpdateSc
         pass
 
     @abstractmethod
-    async def update(self, id: str, data: UpdateSchemaType, current_user: FirebaseUser) -> ModelType:
+    async def update(self, pk: int | str, data: UpdateSchemaType, current_user: FirebaseUser) -> ModelType:
         pass
 
     @abstractmethod
-    async def delete(self, id: str, current_user: FirebaseUser) -> None:
+    async def delete(self, pk: int | str, current_user: FirebaseUser) -> None:
         pass
 
 

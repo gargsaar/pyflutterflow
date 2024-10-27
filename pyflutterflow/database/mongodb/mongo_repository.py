@@ -30,8 +30,8 @@ class MongoRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Updat
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Only admins can retrieve all records.")
         return await paginate(self.model, params, sort=[kwargs.get('sort', "-created_at_utc")])
 
-    async def get(self, id: str, current_user: FirebaseUser) -> ModelType:
-        document = await self.model.get(id)
+    async def get(self, pk: str, current_user: FirebaseUser) -> ModelType:
+        document = await self.model.get(pk)
         if not document:
             raise ValueError("Cannot retrieve MongoDB document: Not found")
         if current_user.role == constants.ADMIN_ROLE:
@@ -50,8 +50,8 @@ class MongoRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Updat
         document = self.model(**data)
         return await document.create()
 
-    async def update(self, id: str, data: UpdateSchemaType, current_user: FirebaseUser) -> ModelType:
-        document = await self.model.get(id)
+    async def update(self, pk: str, data: UpdateSchemaType, current_user: FirebaseUser) -> ModelType:
+        document = await self.model.get(pk)
         if not document:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Cannot update: Not found")
         if current_user.role == constants.ADMIN_ROLE:
@@ -62,8 +62,8 @@ class MongoRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Updat
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="An attempt was made to modify a record not owned by the current user.")
         return await document.update({"$set": data.to_dict()})
 
-    async def delete(self, id: str, current_user: FirebaseUser) -> None:
-        document = await self.model.get(id)
+    async def delete(self, pk: str, current_user: FirebaseUser) -> None:
+        document = await self.model.get(pk)
         if not document:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Cannot delete: Not found")
         if current_user.role == constants.ADMIN_ROLE:
