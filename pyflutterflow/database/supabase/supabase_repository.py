@@ -72,37 +72,9 @@ class SupabaseRepository(
         }
 
     async def list(self, params: Params, current_user: FirebaseUser) -> Page[ModelType]:
-        """
-        Retrieves a paginated list of records associated with the current user.
+        raise NotImplementedError
 
-        Args:
-            params (Params): The pagination parameters.
-            current_user (FirebaseUser): The currently authenticated user.
-
-        Returns:
-            Page[ModelType]: A paginated list of records belonging to the current user.
-        """
-        client = await self.supabase.get_client()
-        pager = self.paginator(params)
-
-        response = (
-            await client.table(self.table_name)
-            .select("*")
-            .eq("user_id", current_user.uid)
-            .range(*pager)
-            .execute()
-        )
-        total_response = (
-            await client.table(self.table_name)
-            .select("id", count="exact")
-            .eq("user_id", current_user.uid)
-            .execute()
-        )
-        total = total_response.count or 0
-        items = [self.model(**item) for item in response.data]
-        return Page.create(items=items, total=total, params=params)
-
-    async def build_paginated_query(self, params: Params, current_user: FirebaseUser, sql_query: str, auth: bool) -> Page[ModelType]:
+    async def build_paginated_query(self, params: Params, current_user: FirebaseUser, sql_query: str, auth: bool = True) -> Page[ModelType]:
         """
         Builds a paginated query for fetching records, optionally with authentication headers.
 
@@ -207,11 +179,9 @@ class SupabaseRepository(
             headers = self.get_token(current_user.uid)
             query.headers.update(headers)
 
-        try:
-            response = await query.execute()
-        except Exception as e:
-            logger.error(f"Error creating record: {e}")
-            raise ValueError(f"Get operation failed: {e}")
+        response = await query.execute()
+        if not response.data:
+            raise ValueError("Record not found")
         return self.model(**response.data[0])
 
     async def create(self, data: CreateSchemaType, current_user: FirebaseUser, **kwargs) -> ModelType:
@@ -231,12 +201,7 @@ class SupabaseRepository(
         client = await self.supabase.get_client()
         serialized_data = data.model_dump(mode='json')
         query = client.table(self.table_name).insert(serialized_data)
-
-        try:
-            response = await query.execute()
-        except Exception as e:
-            logger.error(f"Error creating record: {e}")
-            raise ValueError(f"Insert operation failed: {e}")
+        response = await query.execute()
         return self.model(**response.data[0])
 
     async def update(self, pk: int, data: UpdateSchemaType, current_user: FirebaseUser) -> ModelType:
@@ -254,7 +219,8 @@ class SupabaseRepository(
         client = await self.supabase.get_client()
         serialized_data = data.model_dump(mode='json', exclude_none=True)
         query = client.table(self.table_name).update(serialized_data).eq("id", pk)
-        await query.execute()
+        response = await query.execute()
+        return self.model(**response.data[0])
 
     async def delete(self, pk: int, current_user: FirebaseUser) -> None:
         """
@@ -275,7 +241,16 @@ class SupabaseRepository(
         query = client.table(self.table_name)
 
         try:
-            await query.delete().eq("id", pk).execute()
+            return await query.delete().eq("id", pk).execute()
         except Exception as e:
             logger.error("Error deleting record: %s", e)
             raise ValueError(f"Delete operation failed: {e}") from e
+
+
+    async def restricted_delete(self, pk: int, current_user: FirebaseUser) -> None:
+        """
+        Deletes a record by primary key (ID), ensuring it belongs to the current user.
+        """
+        client = await self.supabase.get_client()
+        query = client.table(self.table_name)
+        return await query.delete().eq("id", pk).eq("member_id", current_user.uid).execute()

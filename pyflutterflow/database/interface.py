@@ -36,26 +36,30 @@ class BaseRepositoryInterface(ABC, Generic[ModelType, CreateSchemaType, UpdateSc
     async def delete(self, pk: int | str, current_user: FirebaseUser) -> None:
         pass
 
+    @abstractmethod
+    async def restricted_delete(self, pk: int | str, current_user: FirebaseUser) -> None:
+        pass
 
 
-def get_targets(collection_name):
-    settings = PyFlutterflow().get_environment()
-    target = settings.db_targets.get(collection_name)
-    if target is None:
-        target = {'read_from': 'firestore', 'write_to': 'firestore'}
 
-    try:
-        read_from = DBTarget(target.get('read_from', 'firestore'))
-        if read_from not in [DBTarget.FIRESTORE, DBTarget.MONGO]:
-            raise ValueError
-    except ValueError:
-        raise ValueError(f"The 'read_from' database target must be either '{DBTarget.FIRESTORE.value}' or '{DBTarget.MONGO.value}'")
+# def get_targets(collection_name):
+#     settings = PyFlutterflow().get_environment()
+#     target = settings.db_targets.get(collection_name)
+#     if target is None:
+#         target = {'read_from': 'firestore', 'write_to': 'firestore'}
 
-    try:
-        write_to = DBTarget(target.get('write_to', 'firestore'))
-        if write_to not in [DBTarget.FIRESTORE, DBTarget.MONGO, DBTarget.BOTH]:
-            raise ValueError(f"The 'write_to' database target must be one of '{DBTarget.FIRESTORE.value}', '{DBTarget.MONGO.value}', or '{DBTarget.BOTH.value}'")
-    except ValueError:
-        raise ValueError(f"The 'write_to' database target must be one of '{DBTarget.FIRESTORE.value}', '{DBTarget.MONGO.value}', or '{DBTarget.BOTH.value}'")
+#     try:
+#         read_from = DBTarget(target.get('read_from', 'firestore'))
+#         if read_from not in [DBTarget.FIRESTORE, DBTarget.MONGO]:
+#             raise ValueError
+#     except ValueError:
+#         raise ValueError(f"The 'read_from' database target must be either '{DBTarget.FIRESTORE.value}' or '{DBTarget.MONGO.value}'")
 
-    return read_from, write_to
+#     try:
+#         write_to = DBTarget(target.get('write_to', 'firestore'))
+#         if write_to not in [DBTarget.FIRESTORE, DBTarget.MONGO, DBTarget.BOTH]:
+#             raise ValueError(f"The 'write_to' database target must be one of '{DBTarget.FIRESTORE.value}', '{DBTarget.MONGO.value}', or '{DBTarget.BOTH.value}'")
+#     except ValueError:
+#         raise ValueError(f"The 'write_to' database target must be one of '{DBTarget.FIRESTORE.value}', '{DBTarget.MONGO.value}', or '{DBTarget.BOTH.value}'")
+
+#     return read_from, write_to
