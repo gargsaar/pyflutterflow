@@ -26,9 +26,9 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     async def list_all(self, params: Params = Depends(), current_user: FirebaseUser = Depends(get_admin_user), **kwargs) -> Page[ModelType]:
         return await self.repository.list_all(params, current_user, **kwargs)
 
-    async def get(self, pk: str, current_user: FirebaseUser = Depends(get_current_user)) -> ModelType:
+    async def get(self, pk: str, current_user: FirebaseUser = Depends(get_current_user), **kwargs) -> ModelType:
         try:
-            return await self.repository.get(pk, current_user)
+            return await self.repository.get(pk, current_user, **kwargs)
         except ValueError as e:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{e}")
 
