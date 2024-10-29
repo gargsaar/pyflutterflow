@@ -2,7 +2,6 @@ import importlib.resources as resources
 from pydantic_settings import BaseSettings
 from fastapi.staticfiles import StaticFiles
 from pyflutterflow.database.supabase.SupabaseModel import SupabaseModel
-from pyflutterflow.database.firestore.FirestoreModel import FirestoreModel
 from pyflutterflow.BaseModels import AppBaseModel
 
 
