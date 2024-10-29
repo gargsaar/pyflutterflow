@@ -1,4 +1,3 @@
-from typing import Generic
 from cachetools import TTLCache
 from fastapi_pagination import Params, Page
 from pyflutterflow.database.supabase.supabase_client import SupabaseClient
@@ -11,10 +10,7 @@ logger = get_logger(__name__)
 token_cache = TTLCache(maxsize=100, ttl=300)
 
 
-class SupabaseRepository(
-    BaseRepositoryInterface[ModelType, CreateSchemaType, UpdateSchemaType],
-    Generic[ModelType, CreateSchemaType, UpdateSchemaType],
-):
+class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, UpdateSchemaType]):
     """
     A repository class for interacting with Supabase, providing CRUD operations for a given model.
     """
@@ -70,9 +66,6 @@ class SupabaseRepository(
         return {
             'Authorization': f'Bearer {jwt_token}',
         }
-
-    async def list(self, params: Params, current_user: FirebaseUser) -> Page[ModelType]:
-        raise NotImplementedError
 
     async def build_paginated_query(self, params: Params, current_user: FirebaseUser, sql_query: str, auth: bool = True) -> Page[ModelType]:
         """

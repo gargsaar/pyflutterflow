@@ -20,13 +20,10 @@ class FirestoreRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, U
         self.collection = self.db.collection(model.Settings.name)
         self.model = model
 
-    async def list(self, params: Params, current_user: FirebaseUser) -> Page[ModelType]:
-        raise NotImplementedError("Firestore paginated lists are not yet available in this Python API")
-
     async def list_all(self, params: Params, current_user: FirebaseUser, **kwargs) -> Page[ModelType]:
         raise NotImplementedError("Firestore paginated lists are not yet available in this Python API")
 
-    async def get(self, id: str, current_user: FirebaseUser) -> ModelType:
+    async def get(self, pk: str, current_user: FirebaseUser) -> ModelType:
         doc_ref = self.collection.document(id)
         doc = await doc_ref.get()
         if not doc.exists:
@@ -45,11 +42,11 @@ class FirestoreRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, U
         data['id'] = kwargs.get('id', str(PydanticObjectId()))
         return await self.model(**data).fs_create()
 
-    async def update(self, id: str, data: UpdateSchemaType, current_user: FirebaseUser) -> ModelType:
+    async def update(self, pk: str, data: UpdateSchemaType, current_user: FirebaseUser) -> ModelType:
         doc_ref = self.collection.document(id)
         await doc_ref.update(data.to_dict())
         return data
 
-    async def delete(self, id: str, current_user: FirebaseUser) -> None:
+    async def delete(self, pk: str, current_user: FirebaseUser) -> None:
         document = await self.get(id, current_user)
         await document.fs_delete()

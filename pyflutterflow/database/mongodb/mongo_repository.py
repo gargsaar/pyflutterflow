@@ -22,9 +22,6 @@ class MongoRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Updat
     def __init__(self, model: type[ModelType]):
         self.model = model
 
-    async def list(self, params: Params, current_user: FirebaseUser) -> Page[ModelType]:
-        return await paginate(self.model.find({"user_id": current_user.uid}), params, sort=["-created_at_utc" ])
-
     async def list_all(self, params: Params, current_user: FirebaseUser, **kwargs) -> Page[ModelType]:
         if current_user.role != constants.ADMIN_ROLE:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Only admins can retrieve all records.")
