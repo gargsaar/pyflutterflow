@@ -137,6 +137,7 @@ class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Up
             Page[ModelType]: A paginated list of records.
         """
         sql_query = kwargs.get('sql_query', '*')
+        return_raw = kwargs.get('return_raw', False)
         auth = kwargs.get('auth', True)
         query = await self.build_paginated_query(params, current_user, sql_query, auth)
 
@@ -145,10 +146,14 @@ class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Up
 
         response = await query.execute()
 
-        items = [self.model(**item) for item in response.data]
-        return Page.create(items=items, total=response.count, params=params)
+        if return_raw:
+            return response.data
+        else:
+            items = [self.model(**item) for item in response.data]
+            return Page.create(items=items, total=response.count, params=params)
 
-    async def get(self, pk: int, current_user: FirebaseUser, auth=True, return_raw=False, **kwargs) -> ModelType:
+
+    async def get(self, pk: int, current_user: FirebaseUser, auth=True, **kwargs) -> ModelType:
         """
         Retrieves a single record by primary key (ID), ensuring it belongs to the current user.
 
@@ -165,6 +170,7 @@ class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Up
         """
         # Create the query
         sql_query = kwargs.get('sql_query', '*')
+        return_raw = kwargs.get('return_raw', False)
 
         client = await self.supabase.get_client()
         query = client.table(self.table_name).select(sql_query).eq("id", pk)
