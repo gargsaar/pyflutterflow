@@ -16,7 +16,7 @@ class BaseRepositoryInterface(ABC, Generic[ModelType, CreateSchemaType, UpdateSc
         pass
 
     @abstractmethod
-    async def get(self, pk: int | str, current_user: FirebaseUser) -> ModelType:
+    async def get(self, pk: int | str, current_user: FirebaseUser, **kwargs) -> ModelType:
         pass
 
     @abstractmethod

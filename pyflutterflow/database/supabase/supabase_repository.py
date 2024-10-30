@@ -148,7 +148,7 @@ class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Up
         items = [self.model(**item) for item in response.data]
         return Page.create(items=items, total=response.count, params=params)
 
-    async def get(self, pk: int, current_user: FirebaseUser, auth=True) -> ModelType:
+    async def get(self, pk: int, current_user: FirebaseUser, auth=True, return_raw=False, **kwargs) -> ModelType:
         """
         Retrieves a single record by primary key (ID), ensuring it belongs to the current user.
 
@@ -164,8 +164,10 @@ class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Up
             ValueError: If the record does not exist or the operation fails.
         """
         # Create the query
+        sql_query = kwargs.get('sql_query', '*')
+
         client = await self.supabase.get_client()
-        query = client.table(self.table_name).select("*").eq("id", pk)
+        query = client.table(self.table_name).select(sql_query).eq("id", pk)
 
         # Set the auth header
         if auth:
@@ -175,7 +177,11 @@ class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Up
         response = await query.execute()
         if not response.data:
             raise ValueError("Record not found")
-        return self.model(**response.data[0])
+
+        if return_raw:
+            return response.data[0]
+        else:
+            return self.model(**response.data[0])
 
     async def create(self, data: CreateSchemaType, current_user: FirebaseUser, **kwargs) -> ModelType:
         """
