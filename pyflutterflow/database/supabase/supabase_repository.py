@@ -101,13 +101,14 @@ class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Up
 
         return query
 
-    async def build_query(self, current_user: FirebaseUser, sql_query: str = '*', auth: bool = True, table=None) -> Page[ModelType]:
+    async def build_query(self, current_user: FirebaseUser, sql_query: str = '*', is_delete_query: bool = False, auth: bool = True, table=None) -> Page[ModelType]:
         """
         Builds a query for fetching records from the specified table, optionally with authentication headers.
 
         Args:
             current_user (FirebaseUser): The currently authenticated user.
             sql_query (str, optional): The SQL query string for selecting fields. Defaults to '*'.
+            is_delete_query (bool, optional): Whether the query is for deleting records. Defaults to False.
             auth (bool, optional): Whether to include authentication headers in the query. Defaults to True.
             table (str, optional): The name of the table to query. Defaults to None, which uses the model's table name.
 
@@ -117,7 +118,11 @@ class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Up
         client = await self.supabase.get_client()
         if not table:
             table = self.table_name
-        query = client.table(table).select(sql_query)
+
+        if is_delete_query:
+            query = client.table(table).delete()
+        else:
+            query = client.table(table).select(sql_query)
 
         if auth:
             headers = self.get_token(current_user.uid)
