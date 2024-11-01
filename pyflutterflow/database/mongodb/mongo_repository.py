@@ -1,6 +1,6 @@
 from typing import Generic
 from fastapi import HTTPException, status
-from fastapi_pagination import Params, Page
+from pyflutterflow.paginator import Params, Page
 from fastapi_pagination.ext.beanie import paginate
 from pyflutterflow.database.interface import BaseRepositoryInterface
 from pyflutterflow.database import ModelType, CreateSchemaType, UpdateSchemaType

@@ -1,6 +1,6 @@
 from typing import Generic
 from fastapi import Depends, HTTPException, status
-from fastapi_pagination import Page, Params
+from pyflutterflow.paginator import Page, Params
 from pyflutterflow.database.interface import BaseRepositoryInterface
 from pyflutterflow.database import ModelType, CreateSchemaType, UpdateSchemaType
 from pyflutterflow.auth import get_current_user, FirebaseUser, get_admin_user
@@ -14,8 +14,12 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     def __init__(self, repository: BaseRepositoryInterface[ModelType, CreateSchemaType, UpdateSchemaType]):
         self.repository = repository
 
-    async def list_all(self, params: Params = Depends(), current_user: FirebaseUser = Depends(get_admin_user), **kwargs) -> Page[ModelType]:
-        return await self.repository.list_all(params, current_user, **kwargs)
+    async def list_all(self, params: Params = Depends(), current_user: FirebaseUser = Depends(get_admin_user), **kwargs):
+        try:
+            return await self.repository.list_all(params, current_user, **kwargs)
+        except Exception as e:
+            logger.error(f"Error listing records: {e}")
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to list records")
 
     async def get(self, pk: str, current_user: FirebaseUser = Depends(get_current_user), **kwargs) -> ModelType:
         try:
@@ -65,7 +69,11 @@ class BaseAdminService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self.repository = repository
 
     async def list_all(self, params: Params = Depends(), current_user: FirebaseUser = Depends(get_admin_user), **kwargs) -> Page[ModelType]:
-        return await self.repository.list_all(params, current_user, **kwargs)
+        try:
+            return await self.repository.list_all(params, current_user, **kwargs)
+        except Exception as e:
+            logger.error(f"Error listing records: {e}")
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to list records")
 
     async def get(self, pk: int | str, current_user: FirebaseUser = Depends(get_admin_user), **kwargs) -> ModelType:
         try:

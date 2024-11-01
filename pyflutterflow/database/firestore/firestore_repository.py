@@ -1,6 +1,6 @@
 from typing import Generic
 from beanie import PydanticObjectId
-from fastapi_pagination import Params, Page
+from pyflutterflow.paginator import Params, Page
 from pyflutterflow.database.firestore.firestore_client import FirestoreClient
 from pyflutterflow.database.interface import BaseRepositoryInterface
 from pyflutterflow.database import ModelType, CreateSchemaType, UpdateSchemaType

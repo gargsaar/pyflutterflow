@@ -4,6 +4,12 @@ from fastapi_pagination import Page, Params
 from pyflutterflow.database import ModelType, CreateSchemaType, UpdateSchemaType
 from pyflutterflow.auth import FirebaseUser
 from pyflutterflow.logs import get_logger
+"""
+DEPRECATED. This module is on hold and not in use. It references an interface between
+Mongo and Firebase, which may be useful later but I have no time to keep
+updated right now. It may be removed or renovated in the future.
+"""
+
 
 
 logger = get_logger(__name__)

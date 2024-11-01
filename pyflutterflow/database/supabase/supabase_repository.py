@@ -1,10 +1,14 @@
 from cachetools import TTLCache
-from fastapi_pagination import Params, Page
+from pyflutterflow.paginator import Page
+from postgrest.exceptions import APIError
 from pyflutterflow.database.supabase.supabase_client import SupabaseClient
 from pyflutterflow.database.interface import BaseRepositoryInterface
 from pyflutterflow.database import ModelType, CreateSchemaType, UpdateSchemaType
 from pyflutterflow.auth import FirebaseUser
 from pyflutterflow.logs import get_logger
+
+from pyflutterflow.paginator import Params, Page
+
 
 logger = get_logger(__name__)
 token_cache = TTLCache(maxsize=100, ttl=300)
@@ -43,7 +47,7 @@ class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Up
         Returns:
             Tuple[int, int]: The start and end indices for the pagination.
         """
-        start = (params.page - 1) * params.size
+        start = params.page * params.size  # Zero-indexed
         end = start + params.size - 1
         return start, end
 
@@ -144,7 +148,10 @@ class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Up
         if kwargs.get("sort_by"):
             query = query.order(kwargs.get("sort_by"))
 
-        response = await query.execute()
+        try:
+            response = await query.execute()
+        except APIError as e:
+            raise ValueError(f"Error fetching supabase records: {e}") from e
 
         if return_raw:
             return response.data
