@@ -1,14 +1,11 @@
 from cachetools import TTLCache
-from pyflutterflow.paginator import Page
 from postgrest.exceptions import APIError
+from pyflutterflow.paginator import Params, Page
 from pyflutterflow.database.supabase.supabase_client import SupabaseClient
 from pyflutterflow.database.interface import BaseRepositoryInterface
 from pyflutterflow.database import ModelType, CreateSchemaType, UpdateSchemaType
 from pyflutterflow.auth import FirebaseUser
 from pyflutterflow.logs import get_logger
-
-from pyflutterflow.paginator import Params, Page
-
 
 logger = get_logger(__name__)
 token_cache = TTLCache(maxsize=100, ttl=300)

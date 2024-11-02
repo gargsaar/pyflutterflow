@@ -6,7 +6,7 @@ T = TypeVar("T")
 
 class Params(BaseModel):
     page: int = 0
-    size: int = 50
+    size: int = 40
 
 class Page(BaseModel, Generic[T]):  # Inherit from BaseModel
     total: int
