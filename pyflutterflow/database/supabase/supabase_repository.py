@@ -133,7 +133,12 @@ class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Up
         if auth:
             headers = self.get_token(current_user.uid)
             query.headers.update(headers)
-        return query
+        response = await query.execute()
+        if not response.data:
+            logger.error("Error fetching count of records")
+            return 0
+
+        return response.data[0].get('count', 0)
 
     async def list_all(self, params: Params, current_user: FirebaseUser, **kwargs) -> Page[ModelType]:
         """
