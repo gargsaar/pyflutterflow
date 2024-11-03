@@ -127,6 +127,14 @@ class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Up
 
         return query
 
+    async def count(self, current_user: FirebaseUser, auth=True) -> int:
+        client = await self.supabase.get_client()
+        query = client.table(self.table_name).select('count')
+        if auth:
+            headers = self.get_token(current_user.uid)
+            query.headers.update(headers)
+        return query
+
     async def list_all(self, params: Params, current_user: FirebaseUser, **kwargs) -> Page[ModelType]:
         """
         Retrieves a paginated and optionally sorted list of all records.
@@ -214,6 +222,25 @@ class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Up
         """
         client = await self.supabase.get_client()
         serialized_data = data.model_dump(mode='json')
+        query = client.table(self.table_name).insert(serialized_data)
+        response = await query.execute()
+        return self.model(**response.data[0])
+
+    async def create_multiple(self, data: CreateSchemaType, **kwargs) -> ModelType:
+        """
+        Creates N new records.
+
+        Args:
+            data (CreateSchemaType): The data to create the record.
+
+        Returns:
+            ModelType: The created record.
+
+        Raises:
+            ValueError: If the create operation fails.
+        """
+        client = await self.supabase.get_client()
+        serialized_data = [item.model_dump(mode='json') for item in data]
         query = client.table(self.table_name).insert(serialized_data)
         response = await query.execute()
         return self.model(**response.data[0])
