@@ -140,6 +140,25 @@ class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Up
 
         return response.data[0].get('count', 0)
 
+    async def text_search(self, params: Params, search_query: str, current_user: FirebaseUser, auth=True) -> Page[ModelType]:
+        client = await self.supabase.get_client()
+
+        pager = self.paginator(params)
+        query = (
+            client.table(self.table_name)
+            .select('*', count="exact")
+            .ilike('display_name', f'%{search_query}%')
+            .range(*pager)
+        )
+
+        if auth:
+            headers = self.get_token(current_user.uid)
+            query.headers.update(headers)
+
+        response = await query.execute()
+        items = [self.model(**item) for item in response.data]
+        return Page.create(items=items, total=response.count, params=Params())
+
     async def list_all(self, params: Params, current_user: FirebaseUser, **kwargs) -> Page[ModelType]:
         """
         Retrieves a paginated and optionally sorted list of all records.
