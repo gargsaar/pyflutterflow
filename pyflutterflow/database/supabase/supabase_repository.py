@@ -181,6 +181,8 @@ class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Up
 
         if kwargs.get("sort_by"):
             query = query.order(kwargs.get("sort_by"))
+        else:
+            query = query.order("created_at", desc=True)
 
         try:
             response = await query.execute()

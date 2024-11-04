@@ -101,3 +101,10 @@ class BaseAdminService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         except Exception as e:
             logger.error(f"Error deleting record: {e}")
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to delete record: {e}")
+
+    async def restricted_delete(self, pk: int | str, current_user: FirebaseUser = Depends(get_admin_user)) -> None:
+        try:
+            return await self.repository.restricted_delete(pk, current_user)
+        except Exception as e:
+            logger.error(f"Error deleting record: {e}")
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to delete record: {e}")
