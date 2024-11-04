@@ -6,7 +6,7 @@ from pyflutterflow.BaseModels import AppBaseModel
 class DeepLink(AppBaseModel):
     ff_page: str
     deep_link_parameter_name: str | None = None
-    destination_id: str | None = None
+    destination_id: int | str | None = None
     name: str | None = None
 
     @property
@@ -15,7 +15,7 @@ class DeepLink(AppBaseModel):
             return {
                 "initialPageName": self.ff_page,
                 "parameterData": json.dumps({
-                    self.deep_link_parameter_name: str(self.destination_id)
+                    self.deep_link_parameter_name: self.destination_id
                 })
              }
         elif self.ff_page:
@@ -27,18 +27,18 @@ class DeepLink(AppBaseModel):
     def ff_route_uri(self) -> str | None:
         settings = PyFlutterflow().get_environment()
         if self.destination_id and self.ff_page:
-            return f"{settings.deep_link_uri}/{self.ff_page}/{str(self.destination_id)}"
+            return f"{settings.deep_link_uri}/{self.ff_page}/{self.destination_id}"
         elif self.ff_page:
             return f"{settings.deep_link_uri}/{self.ff_page}"
-        else:
-            return None
 
 
 class UserNotificationsRequest(AppBaseModel):
-    recipient_ids: list[str]
+    recipient_ids: list[str] | str
     title: str
     body: str
     deeplink_page_name: str | None = None
+    deep_link_parameter_name: str | None = None
+    destination_id: str | int | None = None
 
 
 class Notification(AppBaseModel):

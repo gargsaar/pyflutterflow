@@ -25,6 +25,16 @@ class PushNotificationService:
         fcm_tokens = user_ref.collection('fcm_tokens').order_by('created_at', direction='DESCENDING').get()
         return [fcm_token.to_dict().get('fcm_token') for fcm_token in fcm_tokens]
 
+    def get_all_users(self) -> list[str]:
+        """
+        Retrieve all user IDs from the Firestore database.
+
+        Returns:
+            list[str]: A list of user IDs.
+        """
+        users = self.firestore_db.collection('users').get()
+        return [user.id for user in users]
+
     def send_notification_to_users(self, user_ids: list[str], notification: Notification, badge: int = 1) -> None:
         """
         Send a notification to multiple users by their user IDs.
