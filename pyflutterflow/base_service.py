@@ -14,7 +14,7 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     def __init__(self, repository: BaseRepositoryInterface[ModelType, CreateSchemaType, UpdateSchemaType]):
         self.repository = repository
 
-    async def list_all(self, params: Params = Depends(), current_user: FirebaseUser = Depends(get_admin_user), **kwargs):
+    async def list_all(self, params: Params = Depends(), current_user: FirebaseUser = Depends(get_current_user), **kwargs):
         try:
             return await self.repository.list_all(params, current_user, **kwargs)
         except Exception as e:
