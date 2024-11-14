@@ -1,5 +1,6 @@
 from datetime import datetime, timezone, timedelta
 from cachetools import TTLCache
+from fastapi.responses import JSONResponse
 import jwt
 import httpx
 from fastapi import Request, Response, Depends
@@ -10,7 +11,18 @@ from pyflutterflow import constants
 
 logger = get_logger(__name__)
 token_cache = TTLCache(maxsize=100, ttl=300)
-
+HOP_BY_HOP_HEADERS = [
+    'connection',
+    'keep-alive',
+    'proxy-authenticate',
+    'proxy-authorization',
+    'te',
+    'trailers',
+    'transfer-encoding',
+    'upgrade',
+    'content-length',
+    'content-encoding',
+]
 
 def generate_jwt(member_id, is_admin: bool = False) -> str:
     """
@@ -95,12 +107,29 @@ async def supabase_request(request: Request, path: str, current_user: FirebaseUs
         )
 
     # Create a response with the Supabase response data
-    return Response(
-        content=supabase_response.content,
-        status_code=supabase_response.status_code,
-        headers=dict(supabase_response.headers),
-        media_type=supabase_response.headers.get('content-type'),
-    )
+    content_type = supabase_response.headers.get('content-type', '')
+
+    response_headers = {
+        key: value
+        for key, value in supabase_response.headers.items()
+        if key.lower() not in HOP_BY_HOP_HEADERS
+    }
+
+    if 'application/json' in content_type:
+        response_content = supabase_response.json()
+        return JSONResponse(
+            content=response_content,
+            status_code=supabase_response.status_code,
+            headers=response_headers
+        )
+    else:
+        # Return raw content for non-JSON responses
+        return Response(
+            content=supabase_response.content,
+            status_code=supabase_response.status_code,
+            headers=response_headers,
+            media_type=content_type,
+        )
 
 
 async def proxy(request: Request, path: str, current_user: FirebaseUser = Depends(get_current_user)):
