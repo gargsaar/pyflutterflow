@@ -1,14 +1,13 @@
-from cachetools import TTLCache
 from postgrest.exceptions import APIError
 from pyflutterflow.paginator import Params, Page
 from pyflutterflow.database.supabase.supabase_client import SupabaseClient
 from pyflutterflow.database.interface import BaseRepositoryInterface
 from pyflutterflow.database import ModelType, CreateSchemaType, UpdateSchemaType
 from pyflutterflow.auth import FirebaseUser
+from pyflutterflow.database.supabase.supabase_functions import get_token
 from pyflutterflow.logs import get_logger
 
 logger = get_logger(__name__)
-token_cache = TTLCache(maxsize=100, ttl=300)
 
 
 class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, UpdateSchemaType]):
@@ -48,26 +47,6 @@ class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Up
         end = start + params.size - 1
         return start, end
 
-    def get_token(self, user_id: str) -> dict:
-        """
-        Generates a JWT token for the user, caching it to reduce unnecessary token generation.
-
-        Args:
-            user_id (str): The user ID for whom to generate the token.
-
-        Returns:
-            dict: A dictionary containing the 'Authorization' header with the Bearer token.
-        """
-        if user_id in token_cache:
-            jwt_token = token_cache[user_id]
-        else:
-            jwt_token = self.supabase.generate_jwt(user_id)
-            token_cache[user_id] = jwt_token
-
-        return {
-            'Authorization': f'Bearer {jwt_token}',
-        }
-
     async def build_paginated_query(self, params: Params, current_user: FirebaseUser, sql_query: str, auth: bool = True) -> Page[ModelType]:
         """
         Builds a paginated query for fetching records, optionally with authentication headers.
@@ -93,8 +72,8 @@ class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Up
 
         # Set the auth header
         if auth:
-            headers = self.get_token(current_user.uid)
-            query.headers.update(headers)
+            token = get_token(current_user.uid)
+            query.headers.update({"Authorization": f"Bearer {token}"})
 
         return query
 
@@ -122,8 +101,8 @@ class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Up
             query = client.table(table).select(sql_query)
 
         if auth:
-            headers = self.get_token(current_user.uid)
-            query.headers.update(headers)
+            token = get_token(current_user.uid)
+            query.headers.update({"Authorization": f"Bearer {token}"})
 
         return query
 
@@ -131,8 +110,8 @@ class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Up
         client = await self.supabase.get_client()
         query = client.table(self.table_name).select('count')
         if auth:
-            headers = self.get_token(current_user.uid)
-            query.headers.update(headers)
+            token = get_token(current_user.uid)
+            query.headers.update({"Authorization": f"Bearer {token}"})
         response = await query.execute()
         if not response.data:
             logger.error("Error fetching count of records")
@@ -152,8 +131,8 @@ class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Up
         )
 
         if auth:
-            headers = self.get_token(current_user.uid)
-            query.headers.update(headers)
+            token = get_token(current_user.uid)
+            query.headers.update({"Authorization": f"Bearer {token}"})
 
         response = await query.execute()
         items = [self.model(**item) for item in response.data]
@@ -220,8 +199,8 @@ class SupabaseRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Up
 
         # Set the auth header
         if auth:
-            headers = self.get_token(current_user.uid)
-            query.headers.update(headers)
+            token = get_token(current_user.uid)
+            query.headers.update({"Authorization": f"Bearer {token}"})
 
         response = await query.execute()
         if not response.data:

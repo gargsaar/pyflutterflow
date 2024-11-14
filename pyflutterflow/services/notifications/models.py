@@ -25,7 +25,7 @@ class DeepLink(AppBaseModel):
 
     @property
     def ff_route_uri(self) -> str | None:
-        settings = PyFlutterflow().get_environment()
+        settings = PyFlutterflow().get_settings()
         if self.destination_id and self.ff_page:
             return f"{settings.deep_link_uri}/{self.ff_page}/{self.destination_id}"
         elif self.ff_page:

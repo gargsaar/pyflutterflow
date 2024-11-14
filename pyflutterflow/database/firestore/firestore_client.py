@@ -22,7 +22,7 @@ class FirestoreClient:
 
     @classmethod
     def init(cls) -> None:
-        settings = PyFlutterflow().get_environment()
+        settings = PyFlutterflow().get_settings()
         credentials = service_account.Credentials.from_service_account_info(settings.firebase_config)
         firestore_client = AsyncClient(credentials=credentials)
         cls.set_client(firestore_client)

@@ -16,7 +16,7 @@ async def initialize_mongodb(document_models):
     Connects to the MongoDB database using credentials from settings and initializes
     Beanie with the specified document models for ORM functionality.
     """
-    settings = PyFlutterflow().get_environment()
+    settings = PyFlutterflow().get_settings()
     try:
         logger.info("Initializing MongoDB Client...")
         prefix = "mongodb" if re.match(PORT_PATTERN, settings.db_host) else "mongodb+srv"

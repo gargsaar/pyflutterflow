@@ -1,5 +1,3 @@
-from datetime import datetime, timedelta, timezone
-import jwt
 from supabase._async.client import AsyncClient, create_client
 from pyflutterflow.logs import get_logger
 from pyflutterflow import PyFlutterflow
@@ -26,7 +24,7 @@ class SupabaseClient:
     def __init__(self):
         """Initialize environment settings and placeholders for Supabase client."""
         if not hasattr(self, '_initialized'):  # Prevent reinitialization on multiple calls
-            settings = PyFlutterflow().get_environment()
+            settings = PyFlutterflow().get_settings()
             self.supabase_url = settings.supabase_url
             self.supabase_key = settings.supabase_key
             self.supabase_jwt_secret = settings.supabase_jwt_secret
@@ -54,28 +52,6 @@ class SupabaseClient:
         if self._client is None:
             await self.initialize_client()
         return self._client
-
-    def generate_jwt(self, member_id):
-        """
-        Generates a JWT token for Supabase authentication.
-
-        Args:
-            user_id: The user ID for which to generate the token.
-
-        Returns:
-            str: The generated JWT token.
-        """
-        payload = {
-            "sub": member_id,
-            "member_id": member_id,
-            "iss": "supabase",
-            "ref": "anjaiogkrejqwnisriqt",
-            "role": "authenticated",
-            "iat": int((datetime.now(timezone.utc)).timestamp()),
-            "exp": int((datetime.now(timezone.utc) + timedelta(days=30)).timestamp()),
-        }
-        token = jwt.encode(payload, self.supabase_jwt_secret, algorithm='HS256')
-        return token
 
     async def close_client(self) -> None:
         """

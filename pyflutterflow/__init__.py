@@ -18,7 +18,7 @@ class PyFlutterflow:
         if settings:
             self.settings = settings
 
-    def get_environment(self):
+    def get_settings(self):
         if not hasattr(self, 'settings'):
             raise ValueError("The Pyflutterflow environment was not initialized. Be sure to initialize Pyflutterflow(settings) in each service.")
         return self.settings

@@ -37,7 +37,7 @@ class CloudinaryService:
 
     def __init__(self, file):
         self.file = file
-        self.settings = PyFlutterflow().get_environment()
+        self.settings = PyFlutterflow().get_settings()
         cloudinary.config(
             cloud_name = self.settings.cloudinary_cloud_name,
             api_key = self.settings.cloudinary_api_key,

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from starlette.responses import FileResponse
 from pyflutterflow.logs import get_logger
 from pyflutterflow.auth import set_user_role, get_users_list
+from pyflutterflow.database.supabase.supabase_functions import proxy, proxy_with_body
 
 logger = get_logger(__name__)
 
@@ -26,3 +27,23 @@ async def create_admin():
 async def get_users(users: list = Depends(get_users_list)):
     # TODO users pagination
     return users
+
+
+@router.get("/supabase/{path:path}")
+async def supabase_get_proxy(response = Depends(proxy)):
+    return response
+
+
+@router.post("/supabase/{path:path}")
+async def supabase_post_proxy(response = Depends(proxy_with_body)):
+    return response
+
+
+@router.patch("/supabase/{path:path}")
+async def supabase_update_proxy(response = Depends(proxy_with_body)):
+    return response
+
+
+@router.delete("/supabase/{path:path}")
+async def supabase_delete_proxy(response = Depends(proxy)):
+    return response
