@@ -12,7 +12,6 @@ from pyflutterflow import PyFlutterflow
 logger = get_logger(__name__)
 
 
-
 class Media(BaseModel):
     public_url: str
     public_id: str | None = None
