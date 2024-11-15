@@ -117,13 +117,18 @@ async def supabase_request(request: Request, path: str, current_user: FirebaseUs
 
     if 'application/json' in content_type:
         response_content = supabase_response.json()
+
+        single_response = request.headers.get('returns-single-response') == 'true'
+        if single_response and len(response_content) == 1:
+            response_content = response_content[0]
+
         return JSONResponse(
             content=response_content,
             status_code=supabase_response.status_code,
             headers=response_headers
         )
-    else:
-        # Return raw content for non-JSON responses
+
+    else:  # Return raw content for non-JSON responses
         return Response(
             content=supabase_response.content,
             status_code=supabase_response.status_code,
