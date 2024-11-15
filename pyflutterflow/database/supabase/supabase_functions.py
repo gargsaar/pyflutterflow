@@ -1,13 +1,16 @@
 from datetime import datetime, timezone, timedelta
 from cachetools import TTLCache
 from fastapi.responses import JSONResponse
+from fastapi import Request, Response, Depends, HTTPException, status
 import jwt
 import httpx
-from fastapi import Request, Response, Depends
 from pyflutterflow.auth import FirebaseUser, get_current_user
 from pyflutterflow import PyFlutterflow
 from pyflutterflow.logs import get_logger
 from pyflutterflow import constants
+from pyflutterflow.database.supabase.supabase_client import SupabaseClient
+from postgrest.exceptions import APIError
+
 
 logger = get_logger(__name__)
 token_cache = TTLCache(maxsize=100, ttl=300)
@@ -168,3 +171,12 @@ async def proxy_with_body(request: Request, body: dict, path: str, current_user:
     if not body:
         logger.warning("No body found in request")
     return await supabase_request(request, path, current_user)
+
+
+async def post_request(table: str, data: dict):
+    client = await SupabaseClient().get_client()
+    try:
+        await client.table(table).insert(data).execute()
+    except APIError as e:
+        logger.error("Error creating booking request: %s", e)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e}")
