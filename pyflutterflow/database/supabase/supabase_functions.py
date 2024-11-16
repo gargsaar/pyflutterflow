@@ -38,6 +38,7 @@ def generate_jwt(member_id, is_admin: bool = False) -> str:
     Returns:
         str: A signed JWT token for authenticating with Supabase.
     """
+    logger.debug("Generating supabase JWT token for member %s. Is Admin: %s", member_id, is_admin)
     settings = PyFlutterflow().get_settings()
     payload = {
         "sub": member_id,
