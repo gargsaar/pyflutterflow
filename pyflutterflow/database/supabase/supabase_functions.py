@@ -12,6 +12,8 @@ from pyflutterflow.database.supabase.supabase_client import SupabaseClient
 from postgrest.exceptions import APIError
 
 
+
+
 logger = get_logger(__name__)
 token_cache = TTLCache(maxsize=100, ttl=300)
 HOP_BY_HOP_HEADERS = [
@@ -180,4 +182,14 @@ async def post_request(table: str, data: dict):
         await client.table(table).insert(data).execute()
     except APIError as e:
         logger.error("Error creating booking request: %s", e)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e}")
+
+
+async def set_admin_flag(user_id: str, is_admin: bool):
+    settings = PyFlutterflow().get_settings()
+    client = await SupabaseClient().get_client()
+    try:
+        await client.table(settings.users_table).update({'is_admin': is_admin}).eq('id', user_id).execute()
+    except APIError as e:
+        logger.error("Error updating user admin flag: %s", e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e}")

@@ -4,6 +4,7 @@ import HomeView from '@/views/HomeView.vue';
 import DatabaseEntityIndex from '@/views/DatabaseEntityIndex.vue';
 import DatabaseEntityDetail from '@/views/DatabaseEntityDetail.vue';
 import UserIndex from '@/views/UserIndex.vue';
+import UserDetail from '@/views/UserDetail.vue';
 import ProfileView from '@/views/AuthViews/ProfileView.vue';
 import LoginView from '@/views/AuthViews/LoginView.vue';
 import SignupView from '@/views/AuthViews/SignupView.vue';
@@ -22,6 +23,12 @@ const router = createRouter({
       path: '/users',
       name: 'UserIndex',
       component: UserIndex,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/users/:uid',
+      name: 'UserDetail',
+      component: UserDetail,
       meta: { requiresAuth: true },
     },
     {

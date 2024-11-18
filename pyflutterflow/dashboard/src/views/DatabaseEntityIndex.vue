@@ -3,15 +3,15 @@
         <h1 class="text-xl flex items-center my-6">
             {{ schema.display_name }} collection
             <span class="px-2 text-surface-400">
-                ({{ databaseEntityIndex.items.length }})
+                ({{ databaseEntityIndex.length }})
             </span>
             <router-link v-if="!schema.read_only" :to="`/${route.params.entity}/create`">
                 <Button icon="fa-solid fa-plus text-green-600" text />
             </router-link>
         </h1>
         <div>
-            <ul v-if="databaseEntityIndex && schema.fields && databaseEntityIndex.items.length > 0">
-                <li v-for="databaseEntity in databaseEntityIndex.items" :key="databaseEntity.id">
+            <ul v-if="databaseEntityIndex && schema.fields && databaseEntityIndex.length > 0">
+                <li v-for="databaseEntity in databaseEntityIndex" :key="databaseEntity.id">
                     <router-link class="w-full outline" :to="`/${route.params.entity}/${databaseEntity.id}`">
                         <div class="outline outline-1 outline-surface-200 rounded-lg shadow p-3 my-3 hover:shadow-lg">
                             <span v-if="schema.fields[0].type === 'Date'">

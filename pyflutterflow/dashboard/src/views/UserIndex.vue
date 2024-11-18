@@ -1,10 +1,11 @@
 <template>
   <div v-if="!!users">
       <h1 class="text-xl my-6">Users</h1>
+      <span>These is the users list you'll find in Firebase. It may or may not match the users table f</span>
       <div>
           <ul v-if="users && users.length > 0" >
               <li v-for="user in users" :key="user.uid">
-                  <router-link class="w-full outline" :to="`/users`">
+                  <router-link class="w-full outline" :to="`/users/${user.uid}`">
                       <div class="flex flex-col outline outline-1 outline-surface-200 rounded-lg shadow p-3 my-3 hover:shadow-lg">
                           <span>{{ user.display_name || 'Unnamed' }}</span>
                           <span class="text-xs text-surface-600">{{ user.email }}</span>

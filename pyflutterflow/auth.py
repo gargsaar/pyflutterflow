@@ -88,6 +88,25 @@ async def get_users_list(_: FirebaseUser = Depends(get_admin_user)) -> FirebaseU
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Error encountered while getting users list.')
 
 
+async def get_firebase_user_by_uid(user_uid: str, _: FirebaseUser = Depends(get_admin_user)) -> FirebaseUser:
+    """Get a list of all users in the firebase auth system."""
+    try:
+        user = auth.get_user(uid=user_uid)
+        data = user._data
+        return FirebaseAuthUser(
+            uid=data.get('localId'),
+            email=data.get('email'),
+            display_name=data.get('displayName'),
+            photo_url=data.get('photoUrl'),
+            last_login_at=data.get('lastLoginAt'),
+            created_at=data.get('createdAt'),
+            custom_attributes=data.get('customAttributes'),
+        )
+    except Exception as e:
+        logger.error("Error encountered during getting users list: %s", e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Error encountered while getting users list.')
+
+
 async def set_user_role(user_claim: FirebaseUserClaims, user: FirebaseUser = Depends(get_admin_user)) -> None:
     """Update the service role permissions on the desired firebase user account. Take care: this action can create an admin."""
     if user.role != constants.ADMIN_ROLE:
@@ -98,7 +117,7 @@ async def set_user_role(user_claim: FirebaseUserClaims, user: FirebaseUser = Dep
     except Exception as e:
         logger.error("Error encountered during setting user role: %s", e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Error encountered while setting user role.')
-
+    return user
 
 async def generate_firebase_verify_link(email: str) -> str:
     return auth.generate_email_verification_link(email)

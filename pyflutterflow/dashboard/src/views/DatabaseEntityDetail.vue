@@ -10,27 +10,28 @@
         <div v-for="field in schema.fields">
             <div v-if="!!field && !!data">
                 <div v-if="field.type === 'String'" class="flex flex-col">
-                    <label class="text-surface-600">{{ field.fieldName }}</label>
+                    <label class="text-surface-600">{{ field.fieldName.replace(/_/g, ' ') }}</label>
                     <InputText v-model="data[field.fieldName]" />
                 </div>
                 <div v-else-if="field.type === 'Date'" class="flex flex-col">
-                    <label class="text-surface-600">{{ field.fieldName }}</label>
+                    <label class="text-surface-600">{{ field.fieldName.replace(/_/g, ' ') }}</label>
                     <DatePicker v-model="data[field.fieldName]" dateFormat="yy-mm-dd" />
                 </div>
                 <div v-else-if="field.type === 'Integer'" class="flex flex-col">
-                    <label class="text-surface-600">{{ field.fieldName }}</label>
+                    <label class="text-surface-600">{{ field.fieldName.replace(/_/g, ' ') }}</label>
                     <InputNumber v-model="data[field.fieldName]" inputId="integeronly" fluid />
                 </div>
                 <div v-else-if="field.type === 'Raw'" class="flex flex-col">
-                    <label class="text-surface-600">{{ field.fieldName }}</label>
+                    <label class="text-surface-600">{{ field.fieldName.replace(/_/g, ' ') }}</label>
                     {{ data[field.fieldName] }}
                 </div>
                 <div v-else-if="field.type === 'Image'" class="flex flex-col">
-                    <label class="text-surface-600">{{ field.fieldName }}</label>
-                    <img class="w-20 h-20 rounded-full" :src="data[field.photo_url]" alt="">
+                    <label class="text-surface-600">{{ field.fieldName.replace(/_/g, ' ') }}</label>
+                    <!-- <img class="w-20 h-20 rounded-full" :src="data[field.photo_url]" alt=""> -->
+                    <InputText v-model="data[field.fieldName]" />
                 </div>
                 <div v-else-if="field.type === 'FirebaseUserList'" class="flex flex-col">
-                    <label class="text-surface-600">{{ field.fieldName }}</label>
+                    <label class="text-surface-600">{{ field.fieldName.replace(/_/g, ' ') }}</label>
                     <div class="text-xs text-surface-600" v-if="data[field.fieldName] && data[field.fieldName].length == 0">None</div>
                     <div v-for="user in data[field.fieldName]" :key="user.id" class="grid grid-cols-2 md:grid-cols-3">
                         <div class="flex flex-col items-center justify-center shadow rounded-lg p-2">

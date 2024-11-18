@@ -10,8 +10,8 @@ export const useDatabaseEntityStore = defineStore({
     errorsList: []
   }),
   actions: {
-    async getDatabaseEntityIndex(collectionName, page, size) {
-      const { data } = await api.get(`/admin${collectionName}?page=${page}&size=${size}`)
+    async getDatabaseEntityIndex(collectionName) {
+      const { data } = await api.get(`/supabase/rest/v1${collectionName}`)
       this.databaseEntityIndex = data
       return data
     },
