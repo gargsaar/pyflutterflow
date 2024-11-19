@@ -176,6 +176,19 @@ async def proxy_with_body(request: Request, body: dict, path: str, current_user:
     return await supabase_request(request, path, current_user)
 
 
+async def get_request(table: str, sql_query: str = '*', eq: tuple | None = None, order_by: str = 'id'):
+    client = await SupabaseClient().get_client()
+    try:
+        query = client.table(table).select(sql_query).order(order_by)
+        if eq:
+            query = query.eq(eq[0], eq[1])
+        response = await query.execute()
+        return response.data
+    except APIError as e:
+        logger.error("Error during supabase GET request: %s", e)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e}")
+
+
 async def post_request(table: str, data: dict):
     client = await SupabaseClient().get_client()
     try:
