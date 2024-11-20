@@ -8,7 +8,8 @@ import UserDetail from '@/views/UserDetail.vue';
 import ProfileView from '@/views/AuthViews/ProfileView.vue';
 import LoginView from '@/views/AuthViews/LoginView.vue';
 import SignupView from '@/views/AuthViews/SignupView.vue';
-import AppCompliance from '@/views/AppCompliance.vue';
+import TermsAndConds from '@/views/TermsAndConds.vue';
+import PrivacyPolicy from '@/views/PrivacyPolicy.vue';
 import NotFound404 from '@/views/NotFound404.vue';
 
 const router = createRouter({
@@ -21,9 +22,15 @@ const router = createRouter({
       meta: { requiresAuth: true, requiresVerifiedEmail: true},
     },
     {
-      path: '/app-compliance/:complianceId',
-      name: 'AppCompliance',
-      component: AppCompliance,
+      path: '/app-compliance/terms-and-conditions',
+      name: 'TermsAndConds',
+      component: TermsAndConds,
+      meta: { requiresAuth: true, requiresVerifiedEmail: true},
+    },
+    {
+      path: '/app-compliance/privacy-policy',
+      name: 'PrivacyPolicy',
+      component: PrivacyPolicy,
       meta: { requiresAuth: true, requiresVerifiedEmail: true},
     },
     {

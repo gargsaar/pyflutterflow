@@ -30,7 +30,7 @@
               <div class="flex justify-between items-center">
                 <img src="@/assets/images/logo.png" alt="logo image" class="dark:invert w-12 rounded" />
                 <div class="flex flex-col p-3">
-                  <span class="font-bold">Flutterflow </span>
+                  <span class="font-bold">{{title}} </span>
                   <span class="text-sm"> Admin</span>
                 </div>
               </div>
@@ -56,7 +56,15 @@ import Drawer from 'primevue/drawer';
 
 import Button from 'primevue/button';
 import Navbar from '@/components/layout/Navbar.vue';
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { useAuthStore } from '@/stores/auth.store';
+
+const authStore = useAuthStore();
+const title = computed(() => authStore.dashboardConfig.title)
+
+onMounted(async () => {
+  await authStore.getDashboardConfig()
+})
 
 const visible = ref(false);
 </script>

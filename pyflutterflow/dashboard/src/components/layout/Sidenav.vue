@@ -19,9 +19,13 @@
 
   <!-- App compliance -->
   <div>
-    <router-link @click="sideBarVisible = false" :to="`/app-compliance/terms-and-conditions`" class="!m-1 !px-3 !my-12 !py-3 flex gap-4 items-center" :class="`/app-compliance/terms-and-conditions` == route.path ? 'bg-surface-700' : ''">
+    <router-link @click="sideBarVisible = false" :to="`/app-compliance/terms-and-conditions`" class="!m-1 !px-3 !mt-12 !py-3 flex gap-4 items-center" :class="`/app-compliance/terms-and-conditions` == route.path ? 'bg-surface-700' : ''">
       <i class="fa-solid text-surface-0 fa-file-signature"></i>
       <span class="text-surface-0" v-bind="props.label">Terms & Conditions</span>
+    </router-link>
+    <router-link @click="sideBarVisible = false" :to="`/app-compliance/privacy-policy`" class="!m-1 !px-3 !py-3 flex gap-4 items-center" :class="`/app-compliance/privacy-policy` == route.path ? 'bg-surface-700' : ''">
+      <i class="fa-solid text-surface-0 fa-file-shield"></i>
+      <span class="text-surface-0" v-bind="props.label">Privacy Policy</span>
     </router-link>
   </div>
 

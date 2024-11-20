@@ -173,12 +173,14 @@ async def proxy_with_body(request: Request, body: dict, path: str, current_user:
     return await supabase_request(request, path, current_user)
 
 
-async def get_request(table: str, sql_query: str = '*', eq: tuple | None = None, order_by: str = 'id'):
+async def get_request(table: str, sql_query: str = '*', eq: tuple | None = None, order_by: str | None = None):
     client = await SupabaseClient().get_client()
     try:
-        query = client.table(table).select(sql_query).order(order_by)
+        query = client.table(table).select(sql_query)
         if eq:
             query = query.eq(eq[0], eq[1])
+        if order_by:
+            query = query.order(order_by)
         response = await query.execute()
         return response.data
     except APIError as e:

@@ -5,6 +5,7 @@ from pyflutterflow.auth import set_user_role, get_users_list, get_current_user, 
 from pyflutterflow.database.supabase.supabase_functions import proxy, proxy_with_body, set_admin_flag
 from pyflutterflow.services.cloudinary_service import CloudinaryService
 from pyflutterflow import constants
+from pyflutterflow.webpages.routes import webpages_router
 
 logger = get_logger(__name__)
 
@@ -12,6 +13,8 @@ router = APIRouter(
     prefix='',
     tags=['Pyflutterflow internal routes'],
 )
+
+router.include_router(webpages_router)
 
 
 @router.get("/configure")

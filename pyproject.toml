@@ -18,6 +18,8 @@ exclude = [
   { path = "pyflutterflow/dashboard/vite.config.js" },
 ]
 
+[tool.poetry.package]
+include = ["webpages/templates/*"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
