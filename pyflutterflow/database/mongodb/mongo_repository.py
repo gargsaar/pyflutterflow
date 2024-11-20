@@ -1,7 +1,7 @@
 from typing import Generic
 from fastapi import HTTPException, status
-from pyflutterflow.paginator import Params, Page
 from fastapi_pagination.ext.beanie import paginate
+from pyflutterflow.paginator import Params, Page
 from pyflutterflow.database.interface import BaseRepositoryInterface
 from pyflutterflow.database import ModelType, CreateSchemaType, UpdateSchemaType
 from pyflutterflow.auth import FirebaseUser
@@ -27,7 +27,7 @@ class MongoRepository(BaseRepositoryInterface[ModelType, CreateSchemaType, Updat
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Only admins can retrieve all records.")
         return await paginate(self.model, params, sort=[kwargs.get('sort', "-created_at_utc")])
 
-    async def get(self, pk: str, current_user: FirebaseUser) -> ModelType:
+    async def get(self, pk: str, current_user: FirebaseUser, **kwargs) -> ModelType:
         document = await self.model.get(pk)
         if not document:
             raise ValueError("Cannot retrieve MongoDB document: Not found")

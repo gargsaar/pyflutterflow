@@ -11,16 +11,20 @@ from pyflutterflow.logs import get_logger
 logger = get_logger(__name__)
 security = HTTPBearer()
 
-DEFAULT_USER_AVATAR_URL = os.getenv("LOG_LEVEL", "INFO").upper()
+AVATAR_PLACEHOLDER_URL = os.getenv("AVATAR_PLACEHOLDER_URL", "")
 REQUIRE_VERIFIED_EMAIL = os.getenv("REQUIRE_VERIFIED_EMAIL") or False
 
 
 class FirebaseUser(BaseModel):
+    """
+    When a firebase auth token is validated and decoded, this
+    is the structure of the user data returned.
+    """
     uid: str
     role: str
     email_verified: bool
     email: str
-    picture: str = os.getenv("DEFAULT_USER_AVATAR_URL", "")
+    picture: str = AVATAR_PLACEHOLDER_URL
     name: str = ''
     auth_time: int
     iat: int
@@ -29,6 +33,10 @@ class FirebaseUser(BaseModel):
 
 
 class FirebaseAuthUser(BaseModel):
+    """
+    The user structure from the firebase auth Python SDK differs slightly from
+    FirebaseUser, so this model is used to represent that user object.
+    """
     uid: str
     email: str
     display_name: str | None = None
@@ -39,6 +47,10 @@ class FirebaseAuthUser(BaseModel):
 
 
 class FirebaseUserClaims(BaseModel):
+    """
+    Some tokens have custom claims, and this feature is used by pyflutterflow
+    to assign and manage admin rights at the token level.
+    """
     uid: str
     role: str = 'admin'
 
@@ -66,7 +78,7 @@ async def get_current_user(token: HTTPAuthorizationCredentials = Depends(securit
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
 
 
-async def get_users_list(_: FirebaseUser = Depends(get_admin_user)) -> FirebaseUser:
+async def get_users_list(_: FirebaseUser = Depends(get_admin_user)) -> list[FirebaseAuthUser]:
     """Get a list of all users in the firebase auth system."""
     try:
         users = auth.list_users(max_results=500)
@@ -88,7 +100,7 @@ async def get_users_list(_: FirebaseUser = Depends(get_admin_user)) -> FirebaseU
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Error encountered while getting users list.')
 
 
-async def get_firebase_user_by_uid(user_uid: str, _: FirebaseUser = Depends(get_admin_user)) -> FirebaseUser:
+async def get_firebase_user_by_uid(user_uid: str, _: FirebaseUser = Depends(get_admin_user)) -> FirebaseAuthUser:
     """Get a list of all users in the firebase auth system."""
     try:
         user = auth.get_user(uid=user_uid)
@@ -107,7 +119,7 @@ async def get_firebase_user_by_uid(user_uid: str, _: FirebaseUser = Depends(get_
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Error encountered while getting users list.')
 
 
-async def set_user_role(user_claim: FirebaseUserClaims, user: FirebaseUser = Depends(get_admin_user)) -> None:
+async def set_user_role(user_claim: FirebaseUserClaims, user: FirebaseUser = Depends(get_admin_user)) -> FirebaseUser:
     """Update the service role permissions on the desired firebase user account. Take care: this action can create an admin."""
     if user.role != constants.ADMIN_ROLE:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User does not have permission to set user role.")

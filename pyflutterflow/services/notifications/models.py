@@ -7,7 +7,6 @@ class DeepLink(AppBaseModel):
     ff_page: str
     deep_link_parameter_name: str | None = None
     destination_id: int | str | None = None
-    name: str | None = None
 
     @property
     def ff_route(self) -> dict | None:

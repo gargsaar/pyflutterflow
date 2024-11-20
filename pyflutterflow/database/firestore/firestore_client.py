@@ -38,8 +38,8 @@ class FirestoreClient:
         Raises:
             ValueError: If an attempt is made to set the client when it's already initialized.
         """
-        # if cls._client is not None:
-        #     raise ValueError("Firestore client is already set.")
+        if cls._client is not None:
+            raise ValueError("Firestore client is already set.")
         cls._client = client
 
     @classmethod

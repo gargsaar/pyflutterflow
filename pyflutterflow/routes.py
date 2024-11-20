@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, UploadFile, File
 from starlette.responses import FileResponse
 from pyflutterflow.logs import get_logger
-from pyflutterflow.auth import set_user_role, get_users_list, get_current_user, get_firebase_user_by_uid, FirebaseAuthUser
+from pyflutterflow.auth import set_user_role, get_users_list, get_current_user, get_firebase_user_by_uid, FirebaseUser, FirebaseAuthUser
 from pyflutterflow.database.supabase.supabase_functions import proxy, proxy_with_body, set_admin_flag
 from pyflutterflow.services.cloudinary_service import CloudinaryService
 from pyflutterflow import constants
@@ -21,7 +21,7 @@ async def serve_vue_config():
 
 
 @router.post("/admin/auth/set-role")
-async def set_role(user: FirebaseAuthUser = Depends(set_user_role)) -> None:
+async def set_role(user: FirebaseUser = Depends(set_user_role)) -> None:
     """
     Set a role (e.g. admin) for a firebase auth user. This will create a custom
     claim in the user's token, available in all requests.
@@ -32,13 +32,13 @@ async def set_role(user: FirebaseAuthUser = Depends(set_user_role)) -> None:
     await set_admin_flag(user.uid, is_admin=user.role==constants.ADMIN_ROLE)
 
 
-@router.get("/admin/auth/users")
+@router.get("/admin/auth/users", response_model=list[FirebaseAuthUser])
 async def get_users(users: list = Depends(get_users_list)):
     # TODO users pagination
     return users
 
 
-@router.get("/admin/auth/users/{user_uid}")
+@router.get("/admin/auth/users/{user_uid}", response_model=FirebaseAuthUser)
 async def get_user_by_id(users: list = Depends(get_firebase_user_by_uid)):
     return users
 

@@ -4,15 +4,12 @@ from fastapi.responses import JSONResponse
 from fastapi import Request, Response, Depends, HTTPException, status
 import jwt
 import httpx
+from postgrest.exceptions import APIError
 from pyflutterflow.auth import FirebaseUser, get_current_user
 from pyflutterflow import PyFlutterflow
 from pyflutterflow.logs import get_logger
 from pyflutterflow import constants
 from pyflutterflow.database.supabase.supabase_client import SupabaseClient
-from postgrest.exceptions import APIError
-
-
-
 
 logger = get_logger(__name__)
 token_cache = TTLCache(maxsize=100, ttl=300)
@@ -28,6 +25,7 @@ HOP_BY_HOP_HEADERS = [
     'content-length',
     'content-encoding',
 ]
+
 
 def generate_jwt(member_id, is_admin: bool = False) -> str:
     """
@@ -55,7 +53,7 @@ def generate_jwt(member_id, is_admin: bool = False) -> str:
     return jwt.encode(payload, settings.supabase_jwt_secret, algorithm='HS256')
 
 
-def get_token(user_id: str, role: str = '') -> dict:
+def get_token(user_id: str, role: str = '') -> str:
     """
     Retrieves or generates a JWT token for the specified user, caching the result for efficiency.
 
@@ -73,7 +71,6 @@ def get_token(user_id: str, role: str = '') -> dict:
         token_cache[user_id] = jwt_token
 
     return jwt_token
-
 
 
 async def supabase_request(request: Request, path: str, current_user: FirebaseUser = Depends(get_current_user)):

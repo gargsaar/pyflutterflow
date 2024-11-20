@@ -1,11 +1,11 @@
 from pathlib import Path
 from pydantic import BaseModel
+from fastapi import HTTPException, status
 import cloudinary
 import cloudinary.api
 from cloudinary.exceptions import Error
 from cloudinary.uploader import upload as cloudinary_upload
 from cloudinary.utils import cloudinary_url
-from fastapi import HTTPException, status
 from pyflutterflow.logs import get_logger
 from pyflutterflow import PyFlutterflow
 

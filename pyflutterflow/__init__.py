@@ -20,7 +20,7 @@ class PyFlutterflow:
 
     def get_settings(self):
         if not hasattr(self, 'settings'):
-            raise ValueError("The Pyflutterflow environment was not initialized. Be sure to initialize Pyflutterflow(settings) in each service.")
+            raise ValueError("The Pyflutterflow environment was not initialized. Be sure to initialize Pyflutterflow(settings) in your main.py module.")
         return self.settings
 
     def dashboard_path(self):
