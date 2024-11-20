@@ -1,13 +1,21 @@
 [tool.poetry]
 name = "pyflutterflow"
-version = "0.1.11"
+version = "0.1.12"
 description = "The companion python library to Flutterflow"
 authors = ["John Kealy <johnckealy.dev@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 package-mode = true
 exclude = [
-  { path = "pyflutterflow/dashboard/node_modules" }
+  { path = "pyflutterflow/dashboard/node_modules" },
+  { path = "pyflutterflow/dashboard/public" },
+  { path = "pyflutterflow/dashboard/package-lock.json" },
+  { path = "pyflutterflow/dashboard/index.html" },
+  { path = "pyflutterflow/dashboard/.env" },
+  { path = "pyflutterflow/dashboard/package.json" },
+  { path = "pyflutterflow/dashboard/postcss.config.js" },
+  { path = "pyflutterflow/dashboard/tailwind.config.js" },
+  { path = "pyflutterflow/dashboard/vite.config.js" },
 ]
 
 

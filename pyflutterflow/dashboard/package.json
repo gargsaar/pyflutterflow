@@ -18,6 +18,7 @@
     "firebase": "^10.14.0",
     "pinia": "^2.2.4",
     "primevue": "^4.0.7",
+    "quill": "^2.0.2",
     "tailwindcss-primeui": "^0.3.4",
     "vue": "^3.4.37",
     "vue-router": "^4.4.5"
