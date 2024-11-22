@@ -45,7 +45,6 @@ def generate_jwt(member_id, is_admin: bool = False) -> str:
         "member_id": member_id,
         'user_role': 'admin' if is_admin else 'authenticated',
         "iss": "supabase",
-        "ref": "anjaiogkrejqwnisriqt",
         "role": "authenticated",
         "iat": int((datetime.now(timezone.utc)).timestamp()),
         "exp": int((datetime.now(timezone.utc) + timedelta(days=30)).timestamp()),
@@ -93,10 +92,10 @@ async def supabase_request(request: Request, path: str, current_user: FirebaseUs
     # mint a new supabase JWT token from the firebase token details
     minted_token = get_token(current_user.uid, current_user.role)
 
-    # Copy and modify headers
     headers = {
         'Authorization': f'Bearer {minted_token}',
-        'apikey': settings.supabase_key,
+        'apikey': settings.supabase_anon_key,
+        'accept': 'application/json'
     }
 
     # Forward the request to Supabase
