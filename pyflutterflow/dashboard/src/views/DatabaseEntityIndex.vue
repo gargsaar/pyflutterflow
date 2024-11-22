@@ -33,6 +33,11 @@
 
         </div>
     </div>
+    <div v-else-if="databaseEntityStore.isLoading" class="md:p-16">
+        <ProgressSpinner style="width: 60px; height: 60px" strokeWidth="5" />
+    </div>
+
+
 </template>
 
 
@@ -43,6 +48,7 @@ import { useDatabaseEntityStore } from '@/stores/databaseEntity.store';
 import Button from 'primevue/button';
 import { useAuthStore } from '@/stores/auth.store';
 import { format } from 'date-fns';
+import ProgressSpinner from 'primevue/progressspinner';
 
 const authStore = useAuthStore();
 const route = useRoute();

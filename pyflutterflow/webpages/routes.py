@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 from pyflutterflow.logs import get_logger
 from pyflutterflow.database.supabase.supabase_functions import get_request
 from pyflutterflow.constants import TERMS_AND_CONDITIONS_ROW_ID, PRIVACY_POLICY_ROW_ID, COMPLIANCE_TABLE
+from pyflutterflow.services.email_service import ResendService
 
 templates_dir = resources.files("pyflutterflow") / "webpages/templates"
 templates = Jinja2Templates(directory=str(templates_dir))
@@ -12,7 +13,6 @@ logger = get_logger(__name__)
 
 webpages_router = APIRouter(
     prefix='/webpages',
-    tags=['Webpages'],
 )
 
 @webpages_router.get('/terms-and-conditions', status_code=status.HTTP_200_OK)
@@ -49,7 +49,7 @@ async def get_data_deletion_request_form(request: Request):
 @webpages_router.post('/data-removal-request', status_code=status.HTTP_200_OK)
 async def get_data_deletion_request_submit(request: Request):
 
-    # TODO do something with this. We'll want a database entry and an email send to the admin
+    # TODO this will send an email if resend is set up, but we still need to add a database entry.
 
     form_data = await request.form()
     html = f"""
@@ -59,10 +59,18 @@ async def get_data_deletion_request_submit(request: Request):
         <p>Name: {form_data.get('name')}</p>
         <p>Email: {form_data.get('email')}</p>
         <br>
+        <p>Message:</p>
+        <p>{form_data.get('message')}</p>
+        <br>
+
         <p>This is an automated email.</p>
     """
     logger.warning("Data deletion request submitted, but email are deactivated.")
-    # await ResendService().send_email(settings.admin_emails, 'Data deletion request', html)
+    resend_service = ResendService()
+    await resend_service.send_email_to_admins(
+        subject='Data deletion request',
+        html=html
+    )
     return templates.TemplateResponse(
         request=request, name="data_deletion_request_submitted.html"
     )
