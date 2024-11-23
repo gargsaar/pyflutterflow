@@ -88,15 +88,14 @@ async def supabase_request(request: Request, path: str, current_user: FirebaseUs
 
     supabase_url = f"{settings.supabase_url}/{path}"
     query_params = request.query_params
+    headers = request.headers.mutablecopy()
+    del headers["host"]  # Local environments can interfere with the headers
 
     # mint a new supabase JWT token from the firebase token details
     minted_token = get_token(current_user.uid, current_user.role)
 
-    headers = {
-        'Authorization': f'Bearer {minted_token}',
-        'apikey': settings.supabase_anon_key,
-        'accept': 'application/json'
-    }
+    headers['Authorization'] = f'Bearer {minted_token}'
+    headers['apikey'] = settings.supabase_anon_key
 
     # Forward the request to Supabase
     async with httpx.AsyncClient() as client:
@@ -108,35 +107,11 @@ async def supabase_request(request: Request, path: str, current_user: FirebaseUs
             content=await request.body(),
         )
 
-    # Create a response with the Supabase response data
-    content_type = supabase_response.headers.get('content-type', '')
-
-    response_headers = {
-        key: value
-        for key, value in supabase_response.headers.items()
-        if key.lower() not in HOP_BY_HOP_HEADERS
-    }
-
-    if 'application/json' in content_type:
-        response_content = supabase_response.json()
-
-        single_response = request.headers.get('returns-single-response') == 'true'
-        if single_response and len(response_content) == 1:
-            response_content = response_content[0]
-
-        return JSONResponse(
-            content=response_content,
-            status_code=supabase_response.status_code,
-            headers=response_headers
-        )
-
-    else:  # Return raw content for non-JSON responses
-        return Response(
-            content=supabase_response.content,
-            status_code=supabase_response.status_code,
-            headers=response_headers,
-            media_type=content_type,
-        )
+    return Response(
+        content=supabase_response.content,
+        status_code=supabase_response.status_code,
+        headers=supabase_response.headers,
+    )
 
 
 async def proxy(request: Request, path: str, current_user: FirebaseUser = Depends(get_current_user)):
