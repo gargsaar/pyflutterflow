@@ -27,22 +27,22 @@ HOP_BY_HOP_HEADERS = [
 ]
 
 
-def generate_jwt(member_id, is_admin: bool = False) -> str:
+def generate_jwt(user_id, is_admin: bool = False) -> str:
     """
     Generates a JWT token for Supabase authentication.
 
     Args:
-        member_id (str): The ID of the member for whom the token is generated.
+        user_id (str): The ID of the user for whom the token is generated.
         is_admin (bool, optional): Flag indicating if the user has admin privileges. Defaults to False.
 
     Returns:
         str: A signed JWT token for authenticating with Supabase.
     """
-    logger.debug("Generating supabase JWT token for member %s. Is Admin: %s", member_id, is_admin)
+    logger.debug("Generating supabase JWT token for user %s. Is Admin: %s", user_id, is_admin)
     settings = PyFlutterflow().get_settings()
     payload = {
-        "sub": member_id,
-        "member_id": member_id,
+        "sub": user_id,
+        "user_id": user_id,
         'user_role': 'admin' if is_admin else 'authenticated',
         "iss": "supabase",
         "role": "authenticated",
@@ -87,13 +87,20 @@ async def supabase_request(request: Request, path: str, current_user: FirebaseUs
     settings = PyFlutterflow().get_settings()
 
     supabase_url = f"{settings.supabase_url}/{path}"
-    query_params = request.query_params
     headers = request.headers.mutablecopy()
     del headers["host"]  # Local environments can interfere with the headers
+
+    query_params = request.query_params._dict
+    if 'single' in request.query_params and request.query_params['single'] == 'true':
+        headers['Prefer'] = 'return=representation'
+        headers["Accept"] = "application/vnd.pgrst.object+json"
+    query_params.pop('single', None)
+
 
     # mint a new supabase JWT token from the firebase token details
     minted_token = get_token(current_user.uid, current_user.role)
 
+    headers['Accept-Encoding'] = 'identity'
     headers['Authorization'] = f'Bearer {minted_token}'
     headers['apikey'] = settings.supabase_anon_key
 
@@ -111,6 +118,7 @@ async def supabase_request(request: Request, path: str, current_user: FirebaseUs
         content=supabase_response.content,
         status_code=supabase_response.status_code,
         headers=supabase_response.headers,
+        media_type = supabase_response.headers.get('content-type')
     )
 
 

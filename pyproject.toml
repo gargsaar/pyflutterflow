@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyflutterflow"
-version = "0.2.2"
+version = "0.2.3"
 description = "The companion python library to Flutterflow"
 authors = ["John Kealy <johnckealy.dev@gmail.com>"]
 license = "MIT"
@@ -50,3 +50,7 @@ filterwarnings = [
   "ignore:pkg_resources is deprecated as an API:DeprecationWarning",
   "ignore::DeprecationWarning:httpx"
 ]
+
+
+[tool.poetry.scripts]
+init_pyflutterflow = "pyflutterflow.utils:init_pyflutterflow"

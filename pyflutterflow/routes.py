@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, UploadFile, File
+from fastapi import APIRouter, Depends, UploadFile, File, Response
 from starlette.responses import FileResponse
 from pyflutterflow.logs import get_logger
-from pyflutterflow.auth import set_user_role, get_users_list, get_current_user, get_firebase_user_by_uid, FirebaseUser, FirebaseAuthUser
+from pyflutterflow.auth import set_user_role, get_users_list, get_current_user, get_firebase_user_by_uid, FirebaseUser, FirebaseAuthUser, run_supabase_firestore_user_sync
 from pyflutterflow.database.supabase.supabase_functions import proxy, proxy_with_body, set_admin_flag
 from pyflutterflow.services.cloudinary_service import CloudinaryService
 from pyflutterflow import constants
@@ -59,6 +59,15 @@ async def get_user_by_id(users: list = Depends(get_firebase_user_by_uid)):
     Get a Firebase user by their UID. This route is only accessible to admins.
     """
     return users
+
+
+@router.get("/admin/auth/sync-users", dependencies=[Depends(run_supabase_firestore_user_sync)])
+async def supabase_firestore_user_sync():
+    """
+    Sync Firebase users with Supabase users. This will create a new user in the
+    Supabase users table for each Firebase user, if not present.
+    """
+    pass
 
 ###############################################
 
