@@ -1,6 +1,5 @@
 from datetime import datetime, timezone, timedelta
 from cachetools import TTLCache
-from fastapi.responses import JSONResponse
 from fastapi import Request, Response, Depends, HTTPException, status
 import jwt
 import httpx
@@ -13,18 +12,6 @@ from pyflutterflow.database.supabase.supabase_client import SupabaseClient
 
 logger = get_logger(__name__)
 token_cache = TTLCache(maxsize=100, ttl=300)
-HOP_BY_HOP_HEADERS = [
-    'connection',
-    'keep-alive',
-    'proxy-authenticate',
-    'proxy-authorization',
-    'te',
-    'trailers',
-    'transfer-encoding',
-    'upgrade',
-    'content-length',
-    'content-encoding',
-]
 
 
 def generate_jwt(user_id, is_admin: bool = False) -> str:

@@ -12,7 +12,7 @@ export const useDatabaseEntityStore = defineStore({
   actions: {
     async getDatabaseEntityIndex(collectionName) {
       this.isLoading = true
-      const { data } = await api.get(`/supabase/rest/v1${collectionName}`)
+      const { data } = await api.get(`/supabase/rest/v1/${collectionName}`)
       this.databaseEntityIndex = data
       this.isLoading = false
       return data
@@ -40,7 +40,7 @@ export const useDatabaseEntityStore = defineStore({
     async createDatabaseEntity(collectionName, payload) {
       this.isLoading = true
       try {
-        await api.post(`/supabase/rest/v1${collectionName}`, payload)
+        await api.post(`/supabase/rest/v1/${collectionName}`, payload)
         return { severity: 'success', summary: "Document created", detail: `The database entry was created successfully`, life: 3000 }
       }
       catch (error) {
@@ -54,7 +54,7 @@ export const useDatabaseEntityStore = defineStore({
     async updateDatabaseEntity(collectionName, key, payload) {
       this.isLoading = true
       try {
-        await api.patch(`/supabase/rest/v1${collectionName}/${key}`, payload)
+        await api.patch(`/supabase/rest/v1/${collectionName}?id=eq.${key}`, payload)
         return { severity: 'success', summary: "Document updated", detail: `The database entry was saved successfully`, life: 3000 }
       }
       catch (error) {
@@ -68,7 +68,7 @@ export const useDatabaseEntityStore = defineStore({
     async deleteDatabaseEntity(collectionName, key) {
       this.isLoading = true
       try {
-        await api.delete(`/supabase/rest/v1${collectionName}/${key}`)
+        await api.delete(`/supabase/rest/v1/${collectionName}?id=eq.${key}`)
         return { severity: 'success', summary: "Document removed", detail: `The database entry was deleted successfully`, life: 3000 }
       }
       catch (error) {

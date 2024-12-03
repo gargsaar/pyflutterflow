@@ -128,6 +128,7 @@ async def run_supabase_firestore_user_sync(_: FirebaseUser = Depends(get_admin_u
     """
     sb_client = await SupabaseClient().get_client()
     settings = PyFlutterflow().get_settings()
+    logger.info("Running user sync between Firebase and Supabase.")
     response = await sb_client.table(settings.users_table).select('id').execute()
     supabase_users = [user['id'] for user in response.data]
     try:
@@ -141,7 +142,6 @@ async def run_supabase_firestore_user_sync(_: FirebaseUser = Depends(get_admin_u
                     'photo_url': user.photo_url,
                     'is_admin': user.custom_claims.get('role') == constants.ADMIN_ROLE if user.custom_claims else False,
                 }).execute()
-
     except Exception as e:
         logger.error("Error encountered during getting users list: %s", e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Error encountered while getting users list.')
