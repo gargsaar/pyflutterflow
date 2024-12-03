@@ -6,7 +6,6 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from firebase_admin.auth import ExpiredIdTokenError
 from firebase_admin import auth
 from pyflutterflow import PyFlutterflow, constants
-from pyflutterflow.database.firestore.firestore_client import FirestoreClient
 from pyflutterflow.database.supabase.supabase_client import SupabaseClient
 from pyflutterflow.logs import get_logger
 

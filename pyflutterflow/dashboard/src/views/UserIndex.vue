@@ -1,7 +1,7 @@
 <template>
   <div v-if="!!users">
       <h1 class="text-xl my-6">Users</h1>
-      <span>These is the users list you'll find in Firebase. It may or may not match the users table f</span>
+      <span class="text-sm text-surface-600">These is the users list you'll find in Firebase. (It may or may not match the users table in Supabase.)</span>
       <div>
           <ul v-if="users && users.length > 0" >
               <li v-for="user in users" :key="user.uid">

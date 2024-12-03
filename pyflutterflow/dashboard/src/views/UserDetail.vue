@@ -13,12 +13,13 @@
     <span class="text">{{ user.email }}</span>
 
     <div class="flex justify-between mt-32">
-      <div class="flex flex-col">
-        <span>Last login was {{ formatDate(user.last_login_at) }}</span>
-        <span>User registered on {{ formatDate(user.created_at) }}</span>
+      <div class="flex flex-col justify-end">
+        <span class="text-xs text-surface-600">Last login was  </span> <span class="text-sm text-surface-800">{{ formatDate(user.last_login_at) }}</span>
+        <br>
+        <span class="text-xs text-surface-600">Joined  </span> <span class="text-sm text-surface-800">{{ formatDate(user.created_at) }}</span>
       </div>
-      <div class="flex flex-col">
-        <Button icon="fas fa-user-shield text-surface-600" v-if="!isAdmin" @click="handleMakeAdmin(user.uid)" label="Make Admin" class="mt-4" />
+      <div class="flex flex-col justify-end">
+        <Button icon="fas fa-user-shield text-surface-0" v-if="!isAdmin" @click="handleMakeAdmin(user.uid)" label="Make Admin" class="mt-4" />
         <Button v-else  @click="handleRevokeAdmin(user.uid)" label="Revoke admin privilages" class="mt-4" />
       </div>
     </div>

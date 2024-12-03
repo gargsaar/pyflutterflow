@@ -32,6 +32,7 @@ export default {
           800: '#1e2428',
           900: '#0A0A0A',
         },
+        error: '#D32F2F',
       },
 
       fontFamily: {

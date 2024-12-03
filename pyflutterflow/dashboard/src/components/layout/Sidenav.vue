@@ -7,7 +7,7 @@
     <Menu class="!bg-surface-800 !border-surface-800" :model="menuItems">
       <template #item="{ item, props }">
         <router-link @click="sideBarVisible = false" :to="`/${item.collection_name}`" v-bind="props.action"
-          class="!text-surface-0  !my-0 !py-3 flex gap-4 hover:!bg-surface-700" :class="`/${item.collection_name}` == route.path ? '!bg-surface-700' : ''">
+          class="!text-surface-0  !my-0 !py-3 flex !gap-4 hover:!bg-surface-700" :class="`/${item.collection_name}` == route.path ? '!bg-surface-700' : ''">
           <i class="fa-solid fa-database"></i>
           <span v-bind="props.label">{{ item.display_name }} </span>
         </router-link>

@@ -1,38 +1,34 @@
 <template>
-  <div class="flex flex-col gap-2 md:gap-6 mt-3 md:mt-10">
-    <img src="@/assets/images/logo.png" alt="logo image" class="mx-auto w-32 dark:invert" />
-    <form @submit.prevent="handleLoginSubmit" class="flex flex-col gap-3 md:gap-6 md:mt-10">
-      <div class="flex items-center gap-3 text-surface-400 justify-center">
-        <i class="fa-solid fa-user"></i>
-        <h2 class="text-surface-400 text-center text-sm md:text-base font-display">Please login to continue</h2>
+  <div class="flex flex-col gap-1 md:gap-3 mt-2 md:mt-4">
+    <img src="@/assets/images/logo.png" alt="logo image" class="mx-auto w-20 dark:invert" />
+    <form @submit.prevent="handleLoginSubmit" class="flex flex-col gap-2 md:gap-3 mt-2">
+      <div class="flex items-center gap-2 text-surface-400 justify-center">
+        <i class="fa-solid fa-user text-sm"></i>
+        <h2 class="text-surface-400 text-center text-xs md:text-sm font-display">Please login to continue</h2>
       </div>
 
-      <TextInput placeholder="john@example.com" v-model="formData.email" identifier="emailField" inputType="email" label="Email" />
-      <TextInput placeholder="Enter your password..." v-model="formData.password" identifier="passwordField" inputType="password" label="Password" />
+      <TextInput placeholder="john@example.com" v-model="formData.email" identifier="emailField" inputType="email" label="Email" class="text-sm" />
+      <TextInput placeholder="Enter your password..." v-model="formData.password" identifier="passwordField" inputType="password" label="Password" class="text-sm" />
 
       <PasswordResetModal />
 
       <div>
-        <Button :label="authenticating ? 'Authenticating...' : 'Log in'" type="submit" class="w-full"
+        <Button :label="authenticating ? 'Authenticating...' : 'Log in'" type="submit" class="w-full !py-2"
           :icon="`fa-solid ${authenticating ? 'fa-solid fa-spin fa-cog' : 'fa-user'}`" size="small" />
-        <div v-if="loginError" class="flex items-center gap-3 text-xs m-1 text-error">
+        <div v-if="loginError" class="flex items-center gap-2 text-xs m-1 text-error">
           <i class="fa-solid fa-exclamation-circle"></i>
           <span>{{ loginError }}</span>
         </div>
       </div>
 
-      <span class="text-xs text-surface-600 dark:text-surface-50">Don't have an account?
-        <router-link :to="{ name: 'SignupView' }" class="font-bold hover:text-primary-700 dark:hover:text-primary-200">Sign up</router-link>
-      </span>
-
     </form>
 
-    <Divider type="dotted" align="center">
+    <Divider type="dotted" align="center" class="!my-2">
       <span class="text-xs mx-2">or</span>
     </Divider>
 
     <Button @click="handleGoogleLogin" label="Continue with Google" type="button" severity="secondary" size="small"
-      outlined  :icon="`${authenticating ? 'fa-solid fa-spin fa-cog' : 'fa-brands fa-google'}`" />
+      outlined class="!py-2" :icon="`${authenticating ? 'fa-solid fa-spin fa-cog' : 'fa-brands fa-google'}`" />
   </div>
 </template>
 
