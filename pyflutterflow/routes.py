@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, UploadFile, File, Response
+from fastapi import APIRouter, Depends, UploadFile, File
 from starlette.responses import FileResponse
 from pyflutterflow.logs import get_logger
+from pyflutterflow import PyFlutterflow
 from pyflutterflow.auth import set_user_role, get_users_list, get_current_user, get_firebase_user_by_uid, FirebaseUser, FirebaseAuthUser, run_supabase_firestore_user_sync
 from pyflutterflow.database.supabase.supabase_functions import proxy, proxy_with_body, set_admin_flag
 from pyflutterflow.services.cloudinary_service import CloudinaryService
@@ -25,7 +26,8 @@ async def serve_vue_config():
     The dashboard consumes this configuration to connect to the Firebase and Supabase APIs,
     and to handle the correct database schema.
     """
-    file_path = "admin_config.json"
+    settings = PyFlutterflow().get_settings()
+    file_path = "admin_config.dev.json" if settings.environment == constants.DEV_ENVIRONMENT else "admin_config.json"
     return FileResponse(file_path)
 
 
