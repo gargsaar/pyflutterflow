@@ -30,6 +30,20 @@ export const useUserStore = defineStore({
       return data
     },
 
+    async syncUsers() {
+      this.loading = true
+      try {
+        await api.get(`/admin/auth/sync-users`)
+        return { severity: 'success', summary: 'Users Synced', detail: `The users were synced successfully.`, life: 3000 }
+      }
+      catch (error) {
+        return { severity: 'error', summary: 'Users Sync Failed', detail: `Something went wrong when trying to sync the users. Please try again.`, life: 3000 }
+      }
+      finally {
+        this.loading = false
+      }
+    },
+
     async setUserRole(userID, role) {
       try {
         await api.post(`/admin/auth/set-role`, { uid: userID, role: role });

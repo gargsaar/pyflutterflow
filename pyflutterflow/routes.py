@@ -64,12 +64,14 @@ async def get_user_by_id(users: list = Depends(get_firebase_user_by_uid)):
 
 
 @router.get("/admin/auth/sync-users", dependencies=[Depends(run_supabase_firestore_user_sync)])
-async def supabase_firestore_user_sync():
+async def supabase_firestore_user_sync() -> dict:
     """
     Sync Firebase users with Supabase users. This will create a new user in the
     Supabase users table for each Firebase user, if not present.
     """
-    pass
+    return {
+        "message": "Successfully synced Firebase users with Supabase users"
+    }
 
 ###############################################
 
