@@ -72,8 +72,8 @@ const databaseEntityStore = useDatabaseEntityStore();
 const schema = ref({})
 const confirm = useConfirm();
 
-onMounted(() => {
-    loadData();
+onMounted(async() => {
+    await loadData();
 });
 
 const loadData = async() => {

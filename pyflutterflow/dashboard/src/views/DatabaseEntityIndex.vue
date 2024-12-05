@@ -60,7 +60,6 @@ const schema = ref({})
 
 onMounted(async () => {
     schema.value = authStore.dashboardConfig.models.find(obj => obj.collection_name === route.params.entity);
-    await databaseEntityStore.getDatabaseEntityIndex(route.path, 1, 100)
 })
 
 const formatDate = (dateStr) => {

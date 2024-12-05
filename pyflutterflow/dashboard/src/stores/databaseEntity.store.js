@@ -12,7 +12,7 @@ export const useDatabaseEntityStore = defineStore({
   actions: {
     async getDatabaseEntityIndex(collectionName) {
       this.isLoading = true
-      const { data } = await api.get(`/supabase/rest/v1/${collectionName}`)
+      const { data } = await api.get(`/supabase/rest/v1/${collectionName}?limit=300`)
       this.databaseEntityIndex = data
       this.isLoading = false
       return data
