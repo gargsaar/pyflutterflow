@@ -6,7 +6,7 @@ from pyflutterflow.BaseModels import AppBaseModel
 class DeepLink(AppBaseModel):
     ff_page: str
     deep_link_parameter_name: str | None = None
-    destination_id: int | str | None = None
+    destination_id: str | int | None = None
 
     @property
     def ff_route(self) -> dict | None:

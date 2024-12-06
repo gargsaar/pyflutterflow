@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyflutterflow"
-version = "0.2.6"
+version = "0.2.8"
 description = "The companion python library to Flutterflow"
 authors = ["John Kealy <johnckealy.dev@gmail.com>"]
 license = "MIT"

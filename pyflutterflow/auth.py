@@ -134,16 +134,17 @@ async def run_supabase_firestore_user_sync(_: FirebaseUser = Depends(get_admin_u
         users = auth.list_users()
         for user in users.iterate_all():
             if user.uid not in supabase_users:
-                await sb_client.table(settings.users_table).insert({
-                    'id': user.uid,
-                    'email': user.email,
-                    'display_name': user.display_name,
-                    'photo_url': user.photo_url,
-                    'is_admin': user.custom_claims.get('role') == constants.ADMIN_ROLE if user.custom_claims else False,
-                }).execute()
+                if user.display_name and user.email:
+                    await sb_client.table(settings.users_table).insert({
+                        'id': user.uid,
+                        'email': user.email,
+                        'display_name': user.display_name,
+                        'photo_url': user.photo_url,
+                        'is_admin': user.custom_claims.get('role') == constants.ADMIN_ROLE if user.custom_claims else False,
+                    }).execute()
     except Exception as e:
         logger.error("Error encountered during getting users list: %s", e)
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Error encountered while getting users list.')
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'Error encountered while getting users list: {e}')
 
 
 
