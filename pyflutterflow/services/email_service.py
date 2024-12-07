@@ -22,7 +22,7 @@ class ResendService:
         return True
 
     async def send_email_to_recipients(self) -> dict:
-        member = await get_request(self.settings.users_table, eq=('is_admin', True))
+        member = await get_request(self.settings.users_table)
         if not self.can_send_email(member):
             return
         logger.info("Sending booking request email to admins")

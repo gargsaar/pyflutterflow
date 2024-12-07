@@ -30,9 +30,8 @@ def generate_jwt(user_id, is_admin: bool = False) -> str:
     payload = {
         "sub": user_id,
         "user_id": user_id,
-        'user_role': 'admin' if is_admin else 'authenticated',
         "iss": "supabase",
-        "role": "authenticated",
+        "role": "admin" if is_admin else 'authenticated',
         "iat": int((datetime.now(timezone.utc)).timestamp()),
         "exp": int((datetime.now(timezone.utc) + timedelta(days=30)).timestamp()),
     }
@@ -71,11 +70,18 @@ async def supabase_request(request: Request, path: str, current_user: FirebaseUs
     Returns:
         Response: A FastAPI Response object containing the Supabase response data.
     """
+    BAD_HEADERS = [
+        "host", "origin", "sec-ch-ua", "sec-ch-ua-mobile", "sec-ch-ua-platform",
+        "sec-fetch-dest", "sec-fetch-mode", "sec-fetch-site", "user-agent"
+    ]
+
     settings = PyFlutterflow().get_settings()
 
     supabase_url = f"{settings.supabase_url}/{path}"
     headers = request.headers.mutablecopy()
-    del headers["host"]  # Local environments can interfere with the headers
+    for h in BAD_HEADERS:
+        if h in headers:
+            del headers[h]
 
     query_params = request.query_params._dict
     if 'single' in request.query_params and request.query_params['single'] == 'true':
@@ -101,10 +107,10 @@ async def supabase_request(request: Request, path: str, current_user: FirebaseUs
             content=await request.body(),
         )
 
+    content = supabase_response.content.decode('utf-8', errors='replace')
     return Response(
-        content=supabase_response.content,
+        content=content,
         status_code=supabase_response.status_code,
-        headers=supabase_response.headers,
         media_type = supabase_response.headers.get('content-type')
     )
 

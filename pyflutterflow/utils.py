@@ -31,7 +31,6 @@ def init_pyflutterflow():
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
         html TEXT NOT NULL
-        CONSTRAINT app_compliance_pkey primary key (id)
     );
 
     -- Enable RLS
@@ -70,6 +69,12 @@ def init_pyflutterflow():
     ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
 
+    -- Create an admin role
+    CREATE ROLE admin;
+    GRANT admin TO authenticated;
+    GRANT USAGE ON SCHEMA public TO admin;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO admin;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO admin;
 
 
 
