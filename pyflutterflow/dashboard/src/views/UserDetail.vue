@@ -1,7 +1,11 @@
 <template>
 
 
-  <div v-if="user" class="">
+  <div v-if="userStore.loading" class="flex justify-center items-center md:h-64">
+      <ProgressSpinner style="width: 60px; height: 60px" strokeWidth="5" />
+    </div>
+
+  <div v-else-if="user" class="">
     <div class="flex justify-between">
       <div class="flex flex-col">
         <span class="text-xl">{{ user.display_name }}</span>
@@ -11,6 +15,7 @@
     </div>
 
     <span class="text">{{ user.email }}</span>
+    <Badge v-if="isAdmin" class="ml-3">Admin</Badge>
 
     <div class="flex justify-between mt-32">
       <div class="flex flex-col justify-end">
@@ -19,14 +24,10 @@
         <span class="text-xs text-surface-600">Joined  </span> <span class="text-sm text-surface-800">{{ formatDate(user.created_at) }}</span>
       </div>
       <div class="flex flex-col justify-end">
-        <Button icon="fas fa-user-shield text-surface-0" v-if="!isAdmin" @click="handleMakeAdmin(user.uid)" label="Make Admin" class="mt-4" />
-        <Button v-else  @click="handleRevokeAdmin(user.uid)" label="Revoke admin privilages" class="mt-4" />
+        <Button size="small" icon="fas fa-user-shield text-surface-0" v-if="!isAdmin" @click="handleMakeAdmin(user.uid)" label="Make Admin" class="mt-4" />
+        <Button v-else size="small" @click="handleRevokeAdmin(user.uid)" severity="info" icon="fas fa-close text-surface-0" label="Revoke admin privilages" class="mt-4" />
       </div>
     </div>
-  </div>
-
-  <div v-else-if="userStore.isLoading">
-    <ProgressSpinner style="width: 60px; height: 60px" strokeWidth="5" />
   </div>
 
 
@@ -38,6 +39,7 @@ import { computed } from 'vue'
 import { useUserStore } from '@/stores/user.store'
 import ProgressSpinner from 'primevue/progressspinner';
 import Button from 'primevue/button';
+import Badge from 'primevue/badge';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from "primevue/useconfirm";
 import { useRoute } from 'vue-router';

@@ -65,7 +65,6 @@ async def get_data_deletion_request_submit(request: Request):
 
         <p>This is an automated email.</p>
     """
-    logger.warning("Data deletion request submitted, but email are deactivated.")
     resend_service = ResendService()
     await resend_service.send_email_to_admins(
         subject='Data deletion request',

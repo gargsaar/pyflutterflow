@@ -7,6 +7,7 @@ from firebase_admin.auth import ExpiredIdTokenError
 from firebase_admin import auth
 from pyflutterflow import PyFlutterflow, constants
 from pyflutterflow.database.supabase.supabase_client import SupabaseClient
+from pyflutterflow.database.firestore.firestore_client import FirestoreClient
 from pyflutterflow.logs import get_logger
 
 logger = get_logger(__name__)
@@ -16,13 +17,23 @@ AVATAR_PLACEHOLDER_URL = os.getenv("AVATAR_PLACEHOLDER_URL", "")
 REQUIRE_VERIFIED_EMAIL = os.getenv("REQUIRE_VERIFIED_EMAIL") or False
 
 
+class FirestoreUser(BaseModel):
+    """
+    This will be the structure of the user object stored in firestore.
+    """
+    uid: str
+    email: str
+    display_name: str = 'Unnamed'
+    photo_url: str = AVATAR_PLACEHOLDER_URL
+    is_admin: bool = False
+
+
 class FirebaseUser(BaseModel):
     """
     When a firebase auth token is validated and decoded, this
     is the structure of the user data returned.
     """
     uid: str
-    role: str
     email_verified: bool
     email: str
     picture: str = AVATAR_PLACEHOLDER_URL
@@ -146,6 +157,12 @@ async def run_supabase_firestore_user_sync(_: FirebaseUser = Depends(get_admin_u
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'Error encountered while getting users list: {e}')
 
 
+async def set_admin_flag(user_id: str, is_admin: bool):
+    firestore_client = FirestoreClient().get_client()
+    doc_ref = firestore_client.collection('users').document(user_id)
+    await doc_ref.update({
+        'is_admin': is_admin
+    })
 
 
 async def set_user_role(user_claim: FirebaseUserClaims, user: FirebaseUser = Depends(get_admin_user)) -> FirebaseUser:
@@ -158,6 +175,7 @@ async def set_user_role(user_claim: FirebaseUserClaims, user: FirebaseUser = Dep
     except Exception as e:
         logger.error("Error encountered during setting user role: %s", e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Error encountered while setting user role.')
+    await set_admin_flag(user_claim.uid, is_admin=user_claim.role==constants.ADMIN_ROLE)
     return user
 
 
