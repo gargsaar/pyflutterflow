@@ -49,11 +49,12 @@ def get_token(user_id: str, role: str = '') -> str:
     Returns:
         dict: A dictionary containing the 'Authorization' header with the Bearer token.
     """
-    if user_id in token_cache:
-        jwt_token = token_cache[user_id]
-    else:
-        jwt_token = generate_jwt(user_id, is_admin=role == constants.ADMIN_ROLE)
-        token_cache[user_id] = jwt_token
+    # if user_id in token_cache:
+    #     jwt_token = token_cache[user_id]
+    # else:
+    #     jwt_token = generate_jwt(user_id, is_admin=role == constants.ADMIN_ROLE)
+    #     token_cache[user_id] = jwt_token
+    jwt_token = generate_jwt(user_id, is_admin=role == constants.ADMIN_ROLE)
 
     return jwt_token
 
