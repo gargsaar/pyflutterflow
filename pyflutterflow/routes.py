@@ -3,7 +3,7 @@ from starlette.responses import FileResponse
 from pyflutterflow.logs import get_logger
 from pyflutterflow import PyFlutterflow
 from pyflutterflow.auth import set_user_role, get_users_list, get_current_user, get_firebase_user_by_uid, FirebaseUser, FirebaseAuthUser, run_supabase_firestore_user_sync
-from pyflutterflow.database.supabase.supabase_functions import proxy, proxy_with_body, set_admin_flag
+from pyflutterflow.database.supabase.supabase_functions import proxy, proxy_with_body
 from pyflutterflow.services.cloudinary_service import CloudinaryService
 from pyflutterflow import constants
 from pyflutterflow.webpages.routes import webpages_router
@@ -35,16 +35,12 @@ async def serve_vue_config():
 
 
 @router.post("/admin/auth/set-role")
-async def set_role(user: FirebaseUser = Depends(set_user_role)) -> None:
+async def set_role(_: FirebaseUser = Depends(set_user_role)) -> None:
     """
     Set a role (e.g. admin) for a firebase auth user. This will create a custom
     claim in the user's token, available in all requests.
-
-    Also sets a flag called 'is_admin' in the supabase users table. If the users
-    table is not called 'users', please set the USERS_TABLE environment variable.
     """
-    await set_admin_flag(user.uid, is_admin=user.role==constants.ADMIN_ROLE)
-
+    pass
 
 @router.get("/admin/auth/users", response_model=list[FirebaseAuthUser])
 async def get_users(users: list = Depends(get_users_list)):

@@ -170,13 +170,3 @@ async def post_request(table: str, data: dict):
     except APIError as e:
         logger.error("Error creating booking request: %s", e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e}")
-
-
-async def set_admin_flag(user_id: str, is_admin: bool):
-    settings = PyFlutterflow().get_settings()
-    client = await SupabaseClient().get_client()
-    try:
-        return await client.table(settings.users_table).update({'is_admin': is_admin}).eq('id', user_id).execute()
-    except APIError as e:
-        logger.error("Error updating user admin flag: %s", e)
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e}")

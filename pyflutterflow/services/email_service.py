@@ -1,7 +1,9 @@
 import resend
 from pyflutterflow.logs import get_logger
 from pyflutterflow.database.supabase.supabase_functions import get_request
+from pyflutterflow.database.firestore.firestore_client import FirestoreClient
 from pyflutterflow import PyFlutterflow
+from pyflutterflow.utils import trigger_slack_webhook
 
 logger = get_logger(__name__)
 
@@ -33,14 +35,17 @@ class ResendService:
         logger.error("Email not sent. Missing parameters: %s", self.params)
 
     async def send_email_to_admins(self, subject: str, html: str) -> dict:
-        admins = await get_request(self.settings.users_table, eq=('is_admin', True))
-        admin_emails = [admin.get('email') for admin in admins]
+        firestore_client = FirestoreClient.get_client()
+        users = firestore_client.collection('users')
+        admins_query = users.where('is_admin', '==', True)
+        admin_emails = [admin.get('email') async for admin in admins_query.stream()]
         logger.info("Sending email to admins...")
         self.params['to'] = admin_emails
         self.params['from'] =  f"{self.settings.from_name } <{self.settings.from_email}>"
         self.params['subject'] = subject
         self.params['html'] = html
         if not self.params['to']:
+            trigger_slack_webhook("in send_email_to_admins: No admins found")
             raise ValueError("No admins found")
         if self.params['to'] and self.params['from'] and self.params['subject']  and self.params['html']:
             response = resend.Emails.send(self.params)

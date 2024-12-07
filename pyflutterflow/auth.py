@@ -140,7 +140,6 @@ async def run_supabase_firestore_user_sync(_: FirebaseUser = Depends(get_admin_u
                         'email': user.email,
                         'display_name': user.display_name,
                         'photo_url': user.photo_url,
-                        'is_admin': user.custom_claims.get('role') == constants.ADMIN_ROLE if user.custom_claims else False,
                     }).execute()
     except Exception as e:
         logger.error("Error encountered during getting users list: %s", e)

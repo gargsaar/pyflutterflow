@@ -61,7 +61,6 @@ def init_pyflutterflow():
         email TEXT NULL,
         display_name TEXT NULL,
         photo_url TEXT NULL,
-        is_admin BOOLEAN not NULL DEFAULT false,
         CONSTRAINT users_pkey PRIMARY KEY (id)
     );
 
@@ -75,9 +74,6 @@ def init_pyflutterflow():
     GRANT USAGE ON SCHEMA public TO admin;
     GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO admin;
     ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO admin;
-
-
-
 
     """
     print(message)
