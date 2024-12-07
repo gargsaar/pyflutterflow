@@ -70,11 +70,11 @@ def init_pyflutterflow():
 
     -- Create an admin role
     CREATE ROLE admin;
-    GRANT admin TO authenticated;
 
     GRANT USAGE ON SCHEMA public TO admin;
     GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO admin;
     ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO admin;
 
+    GRANT authenticated TO admin;
     """
     print(message)
