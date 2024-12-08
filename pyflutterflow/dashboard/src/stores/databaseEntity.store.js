@@ -1,5 +1,7 @@
 import api from '@/services/api';
 import { defineStore } from 'pinia'
+import { useAuthStore } from '@/stores/auth.store';
+
 
 export const useDatabaseEntityStore = defineStore({
   id: 'database-entity',
@@ -11,8 +13,14 @@ export const useDatabaseEntityStore = defineStore({
   }),
   actions: {
     async getDatabaseEntityIndex(collectionName) {
+      const authStore = useAuthStore();
+      const orderBy = authStore.dashboardConfig.models.find(obj => obj.collection_name === collectionName).order_by
+      const queryParams = {
+        limit: 300,
+        order: orderBy
+      }
       this.isLoading = true
-      const { data } = await api.get(`/supabase/rest/v1/${collectionName}?limit=300`)
+      const { data } = await api.get(`/supabase/rest/v1/${collectionName}`, {params: queryParams})
       this.databaseEntityIndex = data
       this.isLoading = false
       return data

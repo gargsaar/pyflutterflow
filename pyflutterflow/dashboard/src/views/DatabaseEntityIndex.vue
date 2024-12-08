@@ -67,7 +67,7 @@ const formatDate = (dateStr) => {
     return format(new Date(dateStr), 'EEEE, d MMMM yyyy');
 }
 
-databaseEntityStore.getDatabaseEntityIndex(route.path, 1, 100)
+databaseEntityStore.getDatabaseEntityIndex(route.params.entity)
 
 const databaseEntityIndex = computed(() => databaseEntityStore.databaseEntityIndex)
 

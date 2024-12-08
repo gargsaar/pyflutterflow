@@ -48,7 +48,6 @@
 import { computed, onMounted } from 'vue';
 import Menu from 'primevue/menu';
 import { useRoute } from "vue-router";
-import sideNavStyles from '@/presets/Aura/sidenavmenu'
 import { useAuthStore } from '@/stores/auth.store';
 import LoadingIndicators from '@/components/LoadingIndicators.vue';
 

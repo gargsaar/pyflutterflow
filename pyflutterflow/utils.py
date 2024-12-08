@@ -75,6 +75,6 @@ def init_pyflutterflow():
     GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO admin;
     ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO admin;
 
-    GRANT authenticated TO admin;
+    GRANT admin TO authenticated;
     """
     print(message)
