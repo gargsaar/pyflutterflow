@@ -161,7 +161,7 @@ async def get_request(table: str, sql_query: str = '*', eq: tuple | None = None,
         return response.data
     except APIError as e:
         logger.error("Error during supabase GET request: %s", e)
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e}")
+        raise ValueError(f'Error during pyflutterflow Supabase GET request: {e}')
 
 
 async def post_request(table: str, data: dict):
@@ -169,5 +169,14 @@ async def post_request(table: str, data: dict):
     try:
         return await client.table(table).insert(data).execute()
     except APIError as e:
-        logger.error("Error creating booking request: %s", e)
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e}")
+        logger.error("Error during supabase POST request: %s", e)
+        raise ValueError(f'Error during pyflutterflow Supabase POST request: {e}')
+
+
+async def patch_request(table: str, id: str, data: dict):
+    client = await SupabaseClient().get_client()
+    try:
+        return await client.table(table).update(data).eq('id', id).execute()
+    except APIError as e:
+        logger.error("Error during supabase PATCH request: %s", e)
+        raise ValueError(f'Error during pyflutterflow Supabase PATCH request: {e}')

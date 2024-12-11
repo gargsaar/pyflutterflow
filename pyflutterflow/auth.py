@@ -145,13 +145,16 @@ async def run_supabase_firestore_user_sync(_: FirebaseUser = Depends(get_admin_u
         users = auth.list_users()
         for user in users.iterate_all():
             if user.uid not in supabase_users:
+                logger.info("Adding user: %s", user.uid)
                 if user.display_name and user.email:
                     await sb_client.table(settings.users_table).insert({
                         'id': user.uid,
                         'email': user.email,
                         'display_name': user.display_name,
-                        'photo_url': user.photo_url,
+                        'photo_url': user.photo_url or ''
                     }).execute()
+                else:
+                    logger.warning("User %s does not have a display name or email.", user.uid)
     except Exception as e:
         logger.error("Error encountered during getting users list: %s", e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'Error encountered while getting users list: {e}')
