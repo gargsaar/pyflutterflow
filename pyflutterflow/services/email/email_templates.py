@@ -1,7 +1,16 @@
 from datetime import date
 from pydantic_settings import BaseSettings
 
-def welcome_email_template(recipient: dict, settings: BaseSettings) -> str:
+def welcome_email_template(recipient, settings: BaseSettings, verification_link) -> str:
+
+    verify_button = f"""
+    <a href="{verification_link}" target="_blank">
+        <div class="button">
+            <p>Verify your email address</p>
+        </div>
+    </a>
+    """
+
     return f"""
 <!DOCTYPE html>
 <html lang="en">
@@ -58,9 +67,9 @@ def welcome_email_template(recipient: dict, settings: BaseSettings) -> str:
             <h1>Welcome to {settings.app_title}!</h1>
         </div>
         <div class="content">
-            <p>Hi {recipient.get('display_name', '')},</p>
+            <p>Hi {recipient.name},</p>
             <p>Thank you for registering with {settings.app_title}. We're excited to have you on board!</p>
-            <br>
+                {verify_button if not recipient.email_verified else ''}
             <p>If you have any questions or need assistance, please don't hesitate to reach out to our support team.</p>
         </div>
         <div class="footer">

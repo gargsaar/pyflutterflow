@@ -169,14 +169,15 @@ async def onboard_new_user(current_user: FirebaseUser = Depends(get_current_user
             'id': current_user.uid,
             'email': current_user.email,
             'display_name': current_user.name,
-            'photo_url': current_user.picture or settings.avatar_placeholder_url
+            'photo_url': current_user.picture or settings.avatar_placeholder_url,
         }).execute()
         if not response.data or len(response.data) != 1:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail='Error encountered while creating user record in supabase: Incorrect Postgrest response.'
             )
-        await ResendService().send_welcome_email(response.data[0])
+        verification_link = auth.generate_email_verification_link(current_user.email) if not current_user.email_verified else None
+        await ResendService().send_welcome_email(current_user, verification_link)
     except Exception as e:
         logger.error("Error encountered while creating user record in supabase: %s", e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'Error encountered creating user record in supabase: {e}')
