@@ -3,7 +3,7 @@ from starlette.responses import FileResponse
 from pyflutterflow.logs import get_logger
 from pyflutterflow import PyFlutterflow
 from pyflutterflow.auth import (set_user_role, get_users_list, get_current_user, get_firebase_user_by_uid,
-                                FirebaseUser, FirebaseAuthUser, run_supabase_firestore_user_sync)
+                                FirebaseUser, FirebaseAuthUser, run_supabase_firestore_user_sync, onboard_new_user)
 from pyflutterflow.database.supabase.supabase_functions import proxy, proxy_with_body
 from pyflutterflow.services.cloudinary_service import CloudinaryService
 from pyflutterflow import constants
@@ -63,6 +63,9 @@ async def get_user_by_id(users: list = Depends(get_firebase_user_by_uid)):
     return users
 
 
+
+########### User routes ##################
+
 @router.get("/admin/auth/sync-users", dependencies=[Depends(run_supabase_firestore_user_sync)])
 async def supabase_firestore_user_sync() -> dict:
     """
@@ -72,6 +75,12 @@ async def supabase_firestore_user_sync() -> dict:
     return {
         "message": "Successfully synced Firebase users with Supabase users"
     }
+
+
+@router.get("/onboard-user", dependencies=[Depends(onboard_new_user)])
+async def onboard_user() -> None:
+    pass
+
 
 ###############################################
 

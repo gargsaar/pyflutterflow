@@ -1,9 +1,9 @@
 import resend
 from pyflutterflow.logs import get_logger
-from pyflutterflow.database.supabase.supabase_functions import get_request
 from pyflutterflow.database.firestore.firestore_functions import get_admins
 from pyflutterflow import PyFlutterflow
 from pyflutterflow.utils import trigger_slack_webhook
+from pyflutterflow.services.email.email_templates import welcome_email_template
 
 logger = get_logger(__name__)
 
@@ -24,13 +24,17 @@ class ResendService:
         return True
 
     async def send_email_to_recipients(self) -> dict:
-        member = await get_request(self.settings.users_table)
-        if not self.can_send_email(member):
-            return
-        logger.info("Sending booking request email to admins")
-        if self.params.to and self.params['from'] and self.params.subject and self.params.html:
+        raise NotImplementedError
+
+    async def send_welcome_email(self, recipient: dict) -> dict:
+        logger.info("Sending welcome recipient_email to %s...",  recipient.get('email'))
+        self.params['to'] = recipient.get('email')
+        self.params['from'] = f"{self.settings.from_name } <{self.settings.from_email}>"
+        self.params['subject'] = f'Welcome to {self.settings.app_title}'
+        self.params['html'] = welcome_email_template(recipient, self.settings)
+        if self.params['to'] and self.params['from'] and self.params['subject'] and self.params['html']:
             response = resend.Emails.send(self.params)
-            logger.info("Email sent: %s", response)
+            logger.info("The welcome email has been sent to: %s",  recipient.get('email'))
             return response
         logger.error("Email not sent. Missing parameters: %s", self.params)
 

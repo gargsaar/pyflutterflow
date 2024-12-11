@@ -7,6 +7,7 @@ from firebase_admin.auth import ExpiredIdTokenError
 from firebase_admin import auth
 from pyflutterflow import PyFlutterflow, constants
 from pyflutterflow.database.supabase.supabase_client import SupabaseClient
+from pyflutterflow.services.email.resend_service import ResendService
 from pyflutterflow.database.firestore.firestore_client import FirestoreClient
 from pyflutterflow.logs import get_logger
 
@@ -158,6 +159,27 @@ async def run_supabase_firestore_user_sync(_: FirebaseUser = Depends(get_admin_u
     except Exception as e:
         logger.error("Error encountered during getting users list: %s", e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'Error encountered while getting users list: {e}')
+
+
+async def onboard_new_user(current_user: FirebaseUser = Depends(get_current_user)):
+    settings = PyFlutterflow().get_settings()
+    sb_client = await SupabaseClient().get_client()
+    try:
+        response = await sb_client.table(settings.users_table).upsert({
+            'id': current_user.uid,
+            'email': current_user.email,
+            'display_name': current_user.name,
+            'photo_url': current_user.picture or settings.avatar_placeholder_url
+        }).execute()
+        if not response.data or len(response.data) != 1:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail='Error encountered while creating user record in supabase: Incorrect Postgrest response.'
+            )
+        await ResendService().send_welcome_email(response.data[0])
+    except Exception as e:
+        logger.error("Error encountered while creating user record in supabase: %s", e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'Error encountered creating user record in supabase: {e}')
 
 
 async def set_admin_flag(user_id: str, is_admin: bool):

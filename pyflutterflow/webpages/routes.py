@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from pyflutterflow.logs import get_logger
 from pyflutterflow.database.supabase.supabase_functions import get_request
 from pyflutterflow.constants import TERMS_AND_CONDITIONS_ROW_ID, PRIVACY_POLICY_ROW_ID, COMPLIANCE_TABLE
-from pyflutterflow.services.email_service import ResendService
+from pyflutterflow.services.email.resend_service import ResendService
 
 templates_dir = resources.files("pyflutterflow") / "webpages/templates"
 templates = Jinja2Templates(directory=str(templates_dir))

@@ -1,6 +1,6 @@
 from datetime import datetime, timezone, timedelta
 from cachetools import TTLCache
-from fastapi import Request, Response, Depends, HTTPException, status
+from fastapi import Request, Response, Depends
 import jwt
 import httpx
 from postgrest.exceptions import APIError
