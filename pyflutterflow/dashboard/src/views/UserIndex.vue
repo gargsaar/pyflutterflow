@@ -4,7 +4,8 @@
         <h1 class="text-xl my-6">Users</h1>
         <Button @click="syncUsers" label="Sync users" class="h-fit" size="small" text severity="info" icon="fas fa-sync" />
     </div>
-      <span class="text-sm text-surface-600">These is the users list you'll find in Firebase. (It may or may not match the users table in Supabase.)</span>
+      <span class="text-sm text-surface-600">This is the users list you'll find in Firebase. It may or may not match the users table in Supabase,
+        but you can use the Sync button above to sync this with Supabase.  </span>
       <div>
           <ul v-if="users && users.length > 0" >
               <li v-for="user in users" :key="user.uid">
