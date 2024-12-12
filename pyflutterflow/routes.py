@@ -66,7 +66,7 @@ async def get_user_by_id(users: list = Depends(get_firebase_user_by_uid)):
 
 ########### User routes ##################
 
-@router.get("/admin/auth/sync-users", dependencies=[Depends(run_supabase_firestore_user_sync)])
+@router.post("/admin/auth/sync-users", dependencies=[Depends(run_supabase_firestore_user_sync)])
 async def supabase_firestore_user_sync() -> dict:
     """
     Sync Firebase users with Supabase users. This will create a new user in the
@@ -77,7 +77,7 @@ async def supabase_firestore_user_sync() -> dict:
     }
 
 
-@router.get("/onboard-user", dependencies=[Depends(onboard_new_user)])
+@router.post("/auth/onboard-user", dependencies=[Depends(onboard_new_user)])
 async def onboard_user() -> None:
     pass
 

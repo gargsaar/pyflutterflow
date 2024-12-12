@@ -9,6 +9,7 @@ from pyflutterflow import PyFlutterflow, constants
 from pyflutterflow.database.supabase.supabase_client import SupabaseClient
 from pyflutterflow.services.email.resend_service import ResendService
 from pyflutterflow.database.firestore.firestore_client import FirestoreClient
+from pyflutterflow.utils import trigger_slack_webhook
 from pyflutterflow.logs import get_logger
 
 logger = get_logger(__name__)
@@ -157,6 +158,7 @@ async def run_supabase_firestore_user_sync(_: FirebaseUser = Depends(get_admin_u
                 else:
                     logger.warning("User %s does not have a display name or email.", user.uid)
     except Exception as e:
+        trigger_slack_webhook(f"Error encountered during user sync: {e}")
         logger.error("Error encountered during getting users list: %s", e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'Error encountered while getting users list: {e}')
 
@@ -179,6 +181,7 @@ async def onboard_new_user(current_user: FirebaseUser = Depends(get_current_user
         verification_link = auth.generate_email_verification_link(current_user.email) if not current_user.email_verified else None
         await ResendService().send_welcome_email(current_user, verification_link)
     except Exception as e:
+        trigger_slack_webhook(f"Error encountered while creating user record in supabase: {e}")
         logger.error("Error encountered while creating user record in supabase: %s", e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'Error encountered creating user record in supabase: {e}')
 
