@@ -5,6 +5,7 @@ from pyflutterflow.logs import get_logger
 from pyflutterflow.database.supabase.supabase_functions import get_request
 from pyflutterflow.constants import TERMS_AND_CONDITIONS_ROW_ID, PRIVACY_POLICY_ROW_ID, COMPLIANCE_TABLE
 from pyflutterflow.services.email.resend_service import ResendService
+from pyflutterflow import PyFlutterflow
 
 templates_dir = resources.files("pyflutterflow") / "webpages/templates"
 templates = Jinja2Templates(directory=str(templates_dir))
@@ -40,9 +41,11 @@ async def get_privacy_policy(request: Request):
 
 @webpages_router.get('/data-removal-request', status_code=status.HTTP_200_OK)
 async def get_data_deletion_request_form(request: Request):
+    settings = PyFlutterflow().get_settings()
     return templates.TemplateResponse(
         request=request,
         name="data_deletion_request_form.html",
+        context={"app_title": settings.app_title, "api_base_url": settings.api_base_url},
     )
 
 

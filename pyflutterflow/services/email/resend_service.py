@@ -47,7 +47,7 @@ class ResendService:
         self.params['subject'] = subject
         self.params['html'] = html
         if not self.params['to']:
-            trigger_slack_webhook("in send_email_to_admins: No admins found")
+            trigger_slack_webhook("Problem in send_email_to_admins: No admins found")
             raise ValueError("No admins found")
         if self.params['to'] and self.params['from'] and self.params['subject']  and self.params['html']:
             response = resend.Emails.send(self.params)
