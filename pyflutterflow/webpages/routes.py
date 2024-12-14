@@ -76,3 +76,14 @@ async def get_data_deletion_request_submit(request: Request):
     return templates.TemplateResponse(
         request=request, name="data_deletion_request_submitted.html"
     )
+
+
+
+@webpages_router.get('/support', status_code=status.HTTP_200_OK)
+async def get_support_page(request: Request):
+    settings = PyFlutterflow().get_settings()
+    return templates.TemplateResponse(
+        request=request,
+        name="support_page.html",
+        context={"app_title": settings.app_title, "support_email": settings.support_email},
+    )
