@@ -16,7 +16,6 @@ logger = get_logger(__name__)
 security = HTTPBearer()
 
 AVATAR_PLACEHOLDER_URL = os.getenv("AVATAR_PLACEHOLDER_URL", "")
-REQUIRE_VERIFIED_EMAIL = os.getenv("REQUIRE_VERIFIED_EMAIL") or False
 
 
 class FirestoreUser(BaseModel):
@@ -79,9 +78,10 @@ async def get_admin_user(token: HTTPAuthorizationCredentials = Depends(security)
 
 async def get_current_user(token: HTTPAuthorizationCredentials = Depends(security)) -> FirebaseUser:
     """Verify the JWT token and return the user object."""
+    settings = PyFlutterflow().get_settings()
     try:
         decoded_token = auth.verify_id_token(token.credentials)
-        if REQUIRE_VERIFIED_EMAIL and not decoded_token.get("email_verified"):
+        if settings.require_verified_email and not decoded_token.get("email_verified"):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Email not verified")
         user = FirebaseUser(**decoded_token)
         return user
