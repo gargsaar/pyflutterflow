@@ -23,7 +23,7 @@ class FirestoreUser(BaseModel):
     This will be the structure of the user object stored in firestore.
     """
     uid: str
-    email: str = 'guest@email.com'
+    email: str = constants.GUEST_EMAIL
     display_name: str = 'Unnamed'
     photo_url: str = AVATAR_PLACEHOLDER_URL
     is_admin: bool = False
@@ -36,7 +36,7 @@ class FirebaseUser(BaseModel):
     """
     uid: str
     email_verified: bool = False
-    email: str = 'guest@email.com'
+    email: str = constants.GUEST_EMAIL
     picture: str = AVATAR_PLACEHOLDER_URL
     name: str = 'Guest'
     auth_time: int
@@ -51,7 +51,7 @@ class FirebaseAuthUser(BaseModel):
     FirebaseUser, so this model is used to represent that user object.
     """
     uid: str
-    email: str = 'guest@email.com'
+    email: str = constants.GUEST_EMAIL
     display_name: str | None = None
     photo_url: str | None = None
     last_login_at: str
@@ -178,8 +178,10 @@ async def onboard_new_user(current_user: FirebaseUser = Depends(get_current_user
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail='Error encountered while creating user record in supabase: Incorrect Postgrest response.'
             )
-        verification_link = auth.generate_email_verification_link(current_user.email) if not current_user.email_verified else None
-        await ResendService().send_welcome_email(current_user, verification_link)
+        if current_user.email != constants.GUEST_EMAIL:
+            verification_link = auth.generate_email_verification_link(current_user.email) if not current_user.email_verified else None
+            await ResendService().send_welcome_email(current_user, verification_link)
+        logger.info("User record created in supabase for user: %s", current_user.uid)
     except Exception as e:
         trigger_slack_webhook(f"Error encountered while creating user record in supabase: {e}")
         logger.error("Error encountered while creating user record in supabase: %s", e)
