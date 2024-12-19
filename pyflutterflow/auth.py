@@ -23,7 +23,7 @@ class FirestoreUser(BaseModel):
     This will be the structure of the user object stored in firestore.
     """
     uid: str
-    email: str
+    email: str = 'guest@email.com'
     display_name: str = 'Unnamed'
     photo_url: str = AVATAR_PLACEHOLDER_URL
     is_admin: bool = False
@@ -51,7 +51,7 @@ class FirebaseAuthUser(BaseModel):
     FirebaseUser, so this model is used to represent that user object.
     """
     uid: str
-    email: str
+    email: str = 'guest@email.com'
     display_name: str | None = None
     photo_url: str | None = None
     last_login_at: str
