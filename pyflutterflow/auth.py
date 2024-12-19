@@ -35,10 +35,10 @@ class FirebaseUser(BaseModel):
     is the structure of the user data returned.
     """
     uid: str
-    email_verified: bool
-    email: str
+    email_verified: bool = False
+    email: str = 'guest@email.com'
     picture: str = AVATAR_PLACEHOLDER_URL
-    name: str = ''
+    name: str = 'Guest'
     auth_time: int
     iat: int
     exp: int
