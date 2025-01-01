@@ -122,7 +122,6 @@ def init_pyflutterflow():
         user_id TEXT NOT NULL,
         notification JSON NOT NULL,
         is_read BOOLEAN NOT NULL DEFAULT FALSE,
-        deep_link_uri TEXT NULL,
         CONSTRAINT notifications_pkey PRIMARY KEY (id),
         CONSTRAINT notifications_user_id_fkey FOREIGN KEY (user_id) REFERENCES users (id) ON UPDATE CASCADE ON DELETE CASCADE
     ) tablespace pg_default;

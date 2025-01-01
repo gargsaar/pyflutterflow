@@ -1,6 +1,6 @@
 from typing import TypeVar
-from pyflutterflow.BaseModels import AppBaseModel
+from pydantic import BaseModel
 
 ModelType = TypeVar('ModelType')
-CreateSchemaType = TypeVar('CreateSchemaType', bound=AppBaseModel)
-UpdateSchemaType = TypeVar('UpdateSchemaType', bound=AppBaseModel)
+CreateSchemaType = TypeVar('CreateSchemaType', bound=BaseModel)
+UpdateSchemaType = TypeVar('UpdateSchemaType', bound=BaseModel)

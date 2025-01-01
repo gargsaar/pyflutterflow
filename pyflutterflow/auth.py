@@ -166,12 +166,15 @@ async def run_supabase_firestore_user_sync(_: FirebaseUser = Depends(get_admin_u
 async def onboard_new_user(current_user: FirebaseUser = Depends(get_current_user)):
     settings = PyFlutterflow().get_settings()
     sb_client = await SupabaseClient().get_client()
+    firestore_client = FirestoreClient().get_client()
+    doc = await firestore_client.collection('users').document(current_user.uid).get()
+    user_data = doc.to_dict()
     try:
         response = await sb_client.table(settings.users_table).upsert({
             'id': current_user.uid,
             'email': current_user.email,
-            'display_name': current_user.name,
-            'photo_url': current_user.picture or settings.avatar_placeholder_url,
+            'display_name': user_data.get('display_name', current_user.name),
+            'photo_url': user_data.get('photo_url') or current_user.picture or settings.avatar_placeholder_url,
         }).execute()
         if not response.data or len(response.data) != 1:
             raise HTTPException(

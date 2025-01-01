@@ -19,7 +19,6 @@ class Settings(BaseSettings):
     app_description: str = 'A test suite for the pyflutterflow package'
     log_level: str = 'INFO'
     slack_webhook_url: str | None = None
-    cors_origin: str = 'http://localhost:3000'
     require_verified_email: bool = False
     server_location: str = 'Paris, France'
     supabase_url: str = "http://localhost:8000"
