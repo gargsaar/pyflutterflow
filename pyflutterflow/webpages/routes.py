@@ -45,7 +45,7 @@ async def get_data_deletion_request_form(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="data_deletion_request_form.html",
-        context={"app_title": settings.app_title, "api_base_url": settings.api_base_url},
+        context={"app_title": settings.app_title},
     )
 
 

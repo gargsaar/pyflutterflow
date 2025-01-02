@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "pyflutterflow"
-version = "0.3.22"
+version = "0.3.23"
 description = "The companion python library to Flutterflow"
-authors = ["John Kealy <johnckealy.dev@gmail.com>"]
+authors = ["John Kealy <john@kealy.studio>"]
 license = "MIT"
 readme = "README.md"
 package-mode = true
