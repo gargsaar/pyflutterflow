@@ -143,20 +143,22 @@ async def run_supabase_firestore_user_sync(_: FirebaseUser = Depends(get_admin_u
     logger.info("Running user sync between Firebase and Supabase.")
     response = await sb_client.table(settings.users_table).select('id').execute()
     supabase_users = [user['id'] for user in response.data]
+    firestore_client = FirestoreClient().get_client()
+    user_col = firestore_client.collection("users")
     try:
-        users = auth.list_users()
-        for user in users.iterate_all():
-            if user.uid not in supabase_users:
-                logger.info("Adding user: %s", user.uid)
-                if user.display_name and user.email:
+        async for userdoc in user_col.stream():
+            if userdoc.id not in supabase_users:
+                user = userdoc.to_dict()
+                logger.info("Adding user: %s", userdoc.id)
+                if user.get('display_name') and user.get('email'):
                     await sb_client.table(settings.users_table).insert({
-                        'id': user.uid,
-                        'email': user.email,
-                        'display_name': user.display_name,
-                        'photo_url': user.photo_url or ''
+                        'id': userdoc.id,
+                        'email': user.get('email'),
+                        'display_name': user.get('display_name'),
+                        'photo_url': user.get('photo_url') or ''
                     }).execute()
                 else:
-                    logger.warning("User %s does not have a display name or email.", user.uid)
+                    logger.error("User %s does not have a display name or email.", userdoc.id)
     except Exception as e:
         trigger_slack_webhook(f"Error encountered during user sync: {e}")
         logger.error("Error encountered during getting users list: %s", e)
