@@ -78,7 +78,6 @@ async def get_data_deletion_request_submit(request: Request):
     )
 
 
-
 @webpages_router.get('/support', status_code=status.HTTP_200_OK)
 async def get_support_page(request: Request):
     settings = PyFlutterflow().get_settings()

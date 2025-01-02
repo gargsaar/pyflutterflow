@@ -8,6 +8,7 @@ from pyflutterflow.database.supabase.supabase_functions import proxy, proxy_with
 from pyflutterflow.services.cloudinary_service import CloudinaryService
 from pyflutterflow import constants
 from pyflutterflow.webpages.routes import webpages_router
+from pyflutterflow.services.notifications.routes import notifications_router
 
 logger = get_logger(__name__)
 
@@ -17,7 +18,7 @@ router = APIRouter(
 )
 
 router.include_router(webpages_router)
-
+router.include_router(notifications_router)
 
 @router.get("/configure")
 async def serve_vue_config():

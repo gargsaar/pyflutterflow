@@ -1,10 +1,9 @@
 from datetime import datetime, timezone
-from pydantic import Field
-from pyflutterflow.BaseModels import AppBaseModel
+from pydantic import Field, BaseModel
 from pyflutterflow.database.firestore.firestore_client import FirestoreClient
 
 
-class FirestoreModel(AppBaseModel):
+class FirestoreModel(BaseModel):
     created_at_utc: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     modified_at_utc: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
