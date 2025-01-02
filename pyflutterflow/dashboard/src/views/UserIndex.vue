@@ -1,7 +1,11 @@
 <template>
   <div v-if="!!users">
-      <h1 class="text-xl my-6">Users</h1>
-      <span>These is the users list you'll find in Firebase. It may or may not match the users table f</span>
+    <div class="flex justify-between">
+        <h1 class="text-xl my-6">Users</h1>
+        <Button @click="syncUsers" label="Sync users" class="h-fit" size="small" text severity="info" icon="fas fa-sync" />
+    </div>
+      <span class="text-sm text-surface-600">This is the users list you'll find in Firebase. It may or may not match the users table in Supabase,
+        but you can use the Sync button above to sync this with Supabase.  </span>
       <div>
           <ul v-if="users && users.length > 0" >
               <li v-for="user in users" :key="user.uid">
@@ -31,13 +35,22 @@
 import { ref, computed } from 'vue'
 import { useUserStore } from '@/stores/user.store'
 import ProgressSpinner from 'primevue/progressspinner';
+import Button from 'primevue/button';
+import { useToast } from 'primevue/usetoast';
 
 
 const userStore = useUserStore();
+const toast = useToast();
 
 userStore.getUsers()
 
 
 const users = computed(() => userStore.userIndex)
+
+const syncUsers = async () => {
+  const response = await userStore.syncUsers()
+  toast.add(response)
+}
+
 
 </script>

@@ -1,4 +1,7 @@
 ADMIN_ROLE = 'admin'
+GUEST_EMAIL = 'guest@email.com'
 TERMS_AND_CONDITIONS_ROW_ID = 'terms-and-conditions'
 PRIVACY_POLICY_ROW_ID = 'privacy-policy'
 COMPLIANCE_TABLE = 'app_compliance'
+DEV_ENVIRONMENT = 'development'
+PROD_ENVIRONMENT = 'production'

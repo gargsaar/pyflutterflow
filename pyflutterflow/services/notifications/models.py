@@ -1,12 +1,11 @@
 import json
-from pyflutterflow import PyFlutterflow
-from pyflutterflow.BaseModels import AppBaseModel
+from pydantic import BaseModel
 
 
-class DeepLink(AppBaseModel):
+class DeepLink(BaseModel):
     ff_page: str
     deep_link_parameter_name: str | None = None
-    destination_id: int | str | None = None
+    destination_id: str | int | None = None
 
     @property
     def ff_route(self) -> dict | None:
@@ -22,16 +21,8 @@ class DeepLink(AppBaseModel):
                 "initialPageName": self.ff_page
             }
 
-    @property
-    def ff_route_uri(self) -> str | None:
-        settings = PyFlutterflow().get_settings()
-        if self.destination_id and self.ff_page:
-            return f"{settings.deep_link_uri}/{self.ff_page}/{self.destination_id}"
-        elif self.ff_page:
-            return f"{settings.deep_link_uri}/{self.ff_page}"
 
-
-class UserNotificationsRequest(AppBaseModel):
+class UserNotificationsRequest(BaseModel):
     recipient_ids: list[str] | str
     title: str
     body: str
@@ -40,7 +31,7 @@ class UserNotificationsRequest(AppBaseModel):
     destination_id: str | int | None = None
 
 
-class Notification(AppBaseModel):
+class Notification(BaseModel):
     title: str
     body: str
     image_url: str | None = None

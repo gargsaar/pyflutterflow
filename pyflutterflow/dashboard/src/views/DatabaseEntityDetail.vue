@@ -2,7 +2,7 @@
     <div class=" my-6 flex justify-between ">
         <div class="text-xl">
             <h1 class="text-xl">{{ schema.display_name }} document </h1>
-            <span class="text-xs text-surface-500">{{ route.params.id }}</span>
+            <span class="text-xs text-surface-500">Database ID => {{ route.params.id }}</span>
         </div>
         <Button v-if="!schema.read_only" @click="handleDelete" icon="fa-solid fa-trash text-red-600" text />
     </div>
@@ -27,8 +27,10 @@
                 </div>
                 <div v-else-if="field.type === 'Image'" class="flex flex-col">
                     <label class="text-surface-600">{{ field.fieldName.replace(/_/g, ' ') }}</label>
-                    <!-- <img class="w-20 h-20 rounded-full" :src="data[field.photo_url]" alt=""> -->
-                    <InputText v-model="data[field.fieldName]" />
+                    <div class="md:flex justify-between">
+                        <img v-if="data[field.fieldName]" class="w-40 h-40 rounded-full" :src="data[field.fieldName].public_url" alt="">
+                        <ImageUploader @upload-complete="(uploadData) => handleImageUpload(uploadData, field.fieldName)" />
+                    </div>
                 </div>
                 <div v-else-if="field.type === 'FirebaseUserList'" class="flex flex-col">
                     <label class="text-surface-600">{{ field.fieldName.replace(/_/g, ' ') }}</label>
@@ -57,6 +59,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useDatabaseEntityStore } from '@/stores/databaseEntity.store';
 import InputText from 'primevue/inputtext';
 import { useToast } from 'primevue/usetoast';
+import ImageUploader from '@/components/ui/ImageUploader.vue';
 import { useAuthStore } from '@/stores/auth.store';
 import { useConfirm } from "primevue/useconfirm";
 
@@ -69,8 +72,8 @@ const databaseEntityStore = useDatabaseEntityStore();
 const schema = ref({})
 const confirm = useConfirm();
 
-onMounted(() => {
-    loadData();
+onMounted(async() => {
+    await loadData();
 });
 
 const loadData = async() => {
@@ -78,6 +81,9 @@ const loadData = async() => {
     data.value = await databaseEntityStore.getDatabaseEntityDetail(route.params.entity, route.params.id)
 }
 
+const handleImageUpload = (uploadData, fieldName) => {
+    data.value[fieldName] = uploadData;
+};
 
 const handleSave = async () => {
     const toastResponse = await databaseEntityStore.upsertDatabaseEntity(route.params.entity, route.params.id, data.value)
@@ -85,7 +91,6 @@ const handleSave = async () => {
         router.push(`/${route.params.entity}`)
     toast.add(toastResponse);
 }
-
 
 const handleDelete = async () => {
     confirm.require({
@@ -101,6 +106,4 @@ const handleDelete = async () => {
         }
     });
 }
-
-
 </script>

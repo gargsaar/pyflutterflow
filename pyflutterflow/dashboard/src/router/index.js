@@ -5,9 +5,8 @@ import DatabaseEntityIndex from '@/views/DatabaseEntityIndex.vue';
 import DatabaseEntityDetail from '@/views/DatabaseEntityDetail.vue';
 import UserIndex from '@/views/UserIndex.vue';
 import UserDetail from '@/views/UserDetail.vue';
-import ProfileView from '@/views/AuthViews/ProfileView.vue';
 import LoginView from '@/views/AuthViews/LoginView.vue';
-import SignupView from '@/views/AuthViews/SignupView.vue';
+import ProfileView from '@/views/AuthViews/ProfileView.vue';
 import TermsAndConds from '@/views/TermsAndConds.vue';
 import PrivacyPolicy from '@/views/PrivacyPolicy.vue';
 import NotFound404 from '@/views/NotFound404.vue';
@@ -65,11 +64,6 @@ const router = createRouter({
           path: 'login',
           name: 'LoginView',
           component: LoginView
-        },
-        {
-          path: 'register',
-          name: 'SignupView',
-          component: SignupView
         },
         {
           path: 'profile',

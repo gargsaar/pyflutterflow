@@ -26,7 +26,7 @@ class SupabaseClient:
         if not hasattr(self, '_initialized'):  # Prevent reinitialization on multiple calls
             settings = PyFlutterflow().get_settings()
             self.supabase_url = settings.supabase_url
-            self.supabase_key = settings.supabase_key
+            self.supabase_secret_key = settings.supabase_secret_key
             self.supabase_jwt_secret = settings.supabase_jwt_secret
             self._client: AsyncClient | None = None
             self._initialized = True  # Flag to indicate instance has been initialized
@@ -36,7 +36,7 @@ class SupabaseClient:
         Initializes the Supabase Client instance asynchronously.
         """
         if self._client is None:
-            self._client = await create_client(self.supabase_url, self.supabase_key)
+            self._client = await create_client(self.supabase_url, self.supabase_secret_key)
             logger.info("Supabase Client initialized.")
 
     async def get_client(self) -> AsyncClient:

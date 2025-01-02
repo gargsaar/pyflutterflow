@@ -1,7 +1,6 @@
 from datetime import datetime, timezone, timedelta
 from cachetools import TTLCache
-from fastapi.responses import JSONResponse
-from fastapi import Request, Response, Depends, HTTPException, status
+from fastapi import Request, Response, Depends
 import jwt
 import httpx
 from postgrest.exceptions import APIError
@@ -13,39 +12,26 @@ from pyflutterflow.database.supabase.supabase_client import SupabaseClient
 
 logger = get_logger(__name__)
 token_cache = TTLCache(maxsize=100, ttl=300)
-HOP_BY_HOP_HEADERS = [
-    'connection',
-    'keep-alive',
-    'proxy-authenticate',
-    'proxy-authorization',
-    'te',
-    'trailers',
-    'transfer-encoding',
-    'upgrade',
-    'content-length',
-    'content-encoding',
-]
 
 
-def generate_jwt(member_id, is_admin: bool = False) -> str:
+def generate_jwt(user_id, is_admin: bool = False) -> str:
     """
     Generates a JWT token for Supabase authentication.
 
     Args:
-        member_id (str): The ID of the member for whom the token is generated.
+        user_id (str): The ID of the user for whom the token is generated.
         is_admin (bool, optional): Flag indicating if the user has admin privileges. Defaults to False.
 
     Returns:
         str: A signed JWT token for authenticating with Supabase.
     """
-    logger.debug("Generating supabase JWT token for member %s. Is Admin: %s", member_id, is_admin)
+    logger.debug("Generating supabase JWT token for user %s. Is Admin: %s", user_id, is_admin)
     settings = PyFlutterflow().get_settings()
     payload = {
-        "sub": member_id,
-        "member_id": member_id,
-        'user_role': 'admin' if is_admin else 'authenticated',
+        "sub": user_id,
+        "user_id": user_id,
         "iss": "supabase",
-        "role": "authenticated",
+        "role": "admin" if is_admin else 'authenticated',
         "iat": int((datetime.now(timezone.utc)).timestamp()),
         "exp": int((datetime.now(timezone.utc) + timedelta(days=30)).timestamp()),
     }
@@ -68,7 +54,6 @@ def get_token(user_id: str, role: str = '') -> str:
     else:
         jwt_token = generate_jwt(user_id, is_admin=role == constants.ADMIN_ROLE)
         token_cache[user_id] = jwt_token
-
     return jwt_token
 
 
@@ -84,19 +69,32 @@ async def supabase_request(request: Request, path: str, current_user: FirebaseUs
     Returns:
         Response: A FastAPI Response object containing the Supabase response data.
     """
+    BAD_HEADERS = [
+        "host", "origin", "sec-ch-ua", "sec-ch-ua-mobile", "sec-ch-ua-platform",
+        "sec-fetch-dest", "sec-fetch-mode", "sec-fetch-site", "user-agent"
+    ]
+
     settings = PyFlutterflow().get_settings()
 
     supabase_url = f"{settings.supabase_url}/{path}"
-    query_params = request.query_params
+    headers = request.headers.mutablecopy()
+    for h in BAD_HEADERS:
+        if h in headers:
+            del headers[h]
+
+    query_params = request.query_params._dict
+    if 'single' in request.query_params and request.query_params['single'] == 'true':
+        headers['Prefer'] = 'return=representation'
+        headers["Accept"] = "application/vnd.pgrst.object+json"
+    query_params.pop('single', None)
+
 
     # mint a new supabase JWT token from the firebase token details
     minted_token = get_token(current_user.uid, current_user.role)
 
-    headers = {
-        'Authorization': f'Bearer {minted_token}',
-        'apikey': settings.supabase_anon_key,
-        'accept': 'application/json'
-    }
+    headers['Accept-Encoding'] = 'identity'
+    headers['Authorization'] = f'Bearer {minted_token}'
+    headers['apikey'] = settings.supabase_anon_key
 
     # Forward the request to Supabase
     async with httpx.AsyncClient() as client:
@@ -108,35 +106,12 @@ async def supabase_request(request: Request, path: str, current_user: FirebaseUs
             content=await request.body(),
         )
 
-    # Create a response with the Supabase response data
-    content_type = supabase_response.headers.get('content-type', '')
-
-    response_headers = {
-        key: value
-        for key, value in supabase_response.headers.items()
-        if key.lower() not in HOP_BY_HOP_HEADERS
-    }
-
-    if 'application/json' in content_type:
-        response_content = supabase_response.json()
-
-        single_response = request.headers.get('returns-single-response') == 'true'
-        if single_response and len(response_content) == 1:
-            response_content = response_content[0]
-
-        return JSONResponse(
-            content=response_content,
-            status_code=supabase_response.status_code,
-            headers=response_headers
-        )
-
-    else:  # Return raw content for non-JSON responses
-        return Response(
-            content=supabase_response.content,
-            status_code=supabase_response.status_code,
-            headers=response_headers,
-            media_type=content_type,
-        )
+    content = supabase_response.content.decode('utf-8', errors='replace')
+    return Response(
+        content=content,
+        status_code=supabase_response.status_code,
+        media_type = supabase_response.headers.get('content-type')
+    )
 
 
 async def proxy(request: Request, path: str, current_user: FirebaseUser = Depends(get_current_user)):
@@ -184,7 +159,7 @@ async def get_request(table: str, sql_query: str = '*', eq: tuple | None = None,
         return response.data
     except APIError as e:
         logger.error("Error during supabase GET request: %s", e)
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e}")
+        raise ValueError(f'Error during pyflutterflow Supabase GET request: {e}')
 
 
 async def post_request(table: str, data: dict):
@@ -192,15 +167,14 @@ async def post_request(table: str, data: dict):
     try:
         return await client.table(table).insert(data).execute()
     except APIError as e:
-        logger.error("Error creating booking request: %s", e)
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e}")
+        logger.error("Error during supabase POST request: %s", e)
+        raise ValueError(f'Error during pyflutterflow Supabase POST request: {e}')
 
 
-async def set_admin_flag(user_id: str, is_admin: bool):
-    settings = PyFlutterflow().get_settings()
+async def patch_request(table: str, id: str, data: dict):
     client = await SupabaseClient().get_client()
     try:
-        return await client.table(settings.users_table).update({'is_admin': is_admin}).eq('id', user_id).execute()
+        return await client.table(table).update(data).eq('id', id).execute()
     except APIError as e:
-        logger.error("Error updating user admin flag: %s", e)
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e}")
+        logger.error("Error during supabase PATCH request: %s", e)
+        raise ValueError(f'Error during pyflutterflow Supabase PATCH request: {e}')

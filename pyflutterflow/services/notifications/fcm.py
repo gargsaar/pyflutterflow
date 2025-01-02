@@ -1,6 +1,7 @@
 from firebase_admin import firestore, messaging
 from pyflutterflow.services.notifications.models import Notification
 from pyflutterflow.logs import get_logger
+from pyflutterflow.utils import trigger_slack_webhook
 
 logger = get_logger(__name__)
 
@@ -73,6 +74,11 @@ class PushNotificationService:
             apns=apns,
             data=notification.deep_link.ff_route if notification.deep_link else None
         )
+
+        if not user_tokens:
+            logger.warning("No FCM tokens found while sending notification")
+            trigger_slack_webhook("No matching FCM tokens found while sending notification. Aborting push notification send.")
+            return
 
         try:
             logger.info("Sending batch notification with title '%s'", notification.title)

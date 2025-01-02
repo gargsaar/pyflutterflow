@@ -4,7 +4,8 @@ from fastapi.templating import Jinja2Templates
 from pyflutterflow.logs import get_logger
 from pyflutterflow.database.supabase.supabase_functions import get_request
 from pyflutterflow.constants import TERMS_AND_CONDITIONS_ROW_ID, PRIVACY_POLICY_ROW_ID, COMPLIANCE_TABLE
-from pyflutterflow.services.email_service import ResendService
+from pyflutterflow.services.email.resend_service import ResendService
+from pyflutterflow import PyFlutterflow
 
 templates_dir = resources.files("pyflutterflow") / "webpages/templates"
 templates = Jinja2Templates(directory=str(templates_dir))
@@ -65,7 +66,6 @@ async def get_data_deletion_request_submit(request: Request):
 
         <p>This is an automated email.</p>
     """
-    logger.warning("Data deletion request submitted, but email are deactivated.")
     resend_service = ResendService()
     await resend_service.send_email_to_admins(
         subject='Data deletion request',
@@ -73,4 +73,14 @@ async def get_data_deletion_request_submit(request: Request):
     )
     return templates.TemplateResponse(
         request=request, name="data_deletion_request_submitted.html"
+    )
+
+
+@webpages_router.get('/support', status_code=status.HTTP_200_OK)
+async def get_support_page(request: Request):
+    settings = PyFlutterflow().get_settings()
+    return templates.TemplateResponse(
+        request=request,
+        name="support_page.html",
+        context={"app_title": settings.app_title, "support_email": settings.support_email},
     )

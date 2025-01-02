@@ -13,7 +13,7 @@ import ConfirmationService from 'primevue/confirmationservice';
 
 import App from './App.vue'
 import router from './router'
-import Aura from '@/presets/Aura';
+import Nora from '@primevue/themes/material';
 import Tooltip from 'primevue/tooltip';
 import ToastService from 'primevue/toastservice';
 import Ripple from 'primevue/ripple';
@@ -28,8 +28,11 @@ app.use(router)
 app.use(ConfirmationService);
 app.use(ToastService)
 app.use(PrimeVue, {
-  unstyled: true,
+  theme: {
+    preset: Nora,
+  },
+  // unstyled: true,
   ripple: true,
-  pt: Aura
+  pt: Nora
 })
 app.mount('#app')
