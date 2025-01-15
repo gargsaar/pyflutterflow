@@ -15,8 +15,8 @@
     </Menu>
 
     <!-- Firebase Users -->
-    <router-link @click="sideBarVisible = false" :to="`/users`" class="!m-1 !px-3 !my-12 !py-3 flex gap-4 items-center"
-      :class="`/users` == route.path ? 'bg-surface-700' : ''">
+    <router-link @click="sideBarVisible = false" :to="`/firebase-users`" class="!m-1 !px-3 !my-12 !py-3 flex gap-4 items-center"
+      :class="`/firebase-users` == route.path ? 'bg-surface-700' : ''">
       <i class="fa-solid text-surface-0 fa-users"></i>
       <span class="text-surface-0" v-bind="props.label">Users</span>
     </router-link>

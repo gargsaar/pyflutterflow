@@ -9,7 +9,7 @@
       <div>
           <ul v-if="users && users.length > 0" >
               <li v-for="user in users" :key="user.uid">
-                  <router-link class="w-full outline" :to="`/users/${user.uid}`">
+                  <router-link class="w-full outline" :to="`/firebase-users/${user.uid}`">
                       <div class="flex flex-col outline outline-1 outline-surface-200 rounded-lg shadow p-3 my-3 hover:shadow-lg">
                           <span>{{ user.display_name || 'Unnamed' }}</span>
                           <span class="text-xs text-surface-600">{{ user.email }}</span>

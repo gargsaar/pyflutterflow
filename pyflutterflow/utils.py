@@ -26,6 +26,8 @@ def init_pyflutterflow():
     #####################  COPY EVERYTHING BELOW THIS LINE ###########################
 
 
+    BEGIN;
+
     -- Create an admin role
     CREATE ROLE admin;
     GRANT USAGE ON SCHEMA public TO admin;
@@ -83,6 +85,7 @@ def init_pyflutterflow():
         email TEXT NULL,
         display_name TEXT NULL,
         photo_url TEXT NULL,
+        bio TEXT NULL,
         CONSTRAINT users_pkey PRIMARY KEY (id)
     );
 
@@ -140,6 +143,8 @@ def init_pyflutterflow():
     WITH CHECK (
         (auth.jwt() ->> 'sub'::text) = user_id::text
     );
+
+    COMMIT;
 
 
     """

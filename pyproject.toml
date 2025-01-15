@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyflutterflow"
-version = "0.3.23"
+version = "0.3.25"
 description = "The companion python library to Flutterflow"
 authors = ["John Kealy <john@kealy.studio>"]
 license = "MIT"
@@ -24,6 +24,7 @@ python = "^3.11"
 beanie = "^1.27.0"
 fastapi = "^0.115.2"
 requests = "^2.32.3"
+grpcio = "1.60.1"
 httpx = "^0.27.2"
 pytest = "^8.3.3"
 pytest-asyncio = "^0.24.0"

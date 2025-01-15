@@ -33,13 +33,13 @@ const router = createRouter({
       meta: { requiresAuth: true, requiresVerifiedEmail: true},
     },
     {
-      path: '/users',
+      path: '/firebase-users',
       name: 'UserIndex',
       component: UserIndex,
       meta: { requiresAuth: true },
     },
     {
-      path: '/users/:uid',
+      path: '/firebase-users/:uid',
       name: 'UserDetail',
       component: UserDetail,
       meta: { requiresAuth: true },

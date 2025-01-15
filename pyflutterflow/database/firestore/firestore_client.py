@@ -23,7 +23,6 @@ class FirestoreClient:
     @classmethod
     def init(cls) -> None:
         credentials, _ = default()
-        # credentials = service_account.Credentials.from_service_account_info(settings.firebase_config)
         firestore_client = AsyncClient(credentials=credentials)
         cls.set_client(firestore_client)
 
