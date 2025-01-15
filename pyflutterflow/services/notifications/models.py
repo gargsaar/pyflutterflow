@@ -36,3 +36,9 @@ class Notification(BaseModel):
     body: str
     image_url: str | None = None
     deep_link: DeepLink | None = None
+
+
+class UserNotificationCreate(BaseModel):
+    user_id: str
+    notification: Notification
+    is_read: bool = False
