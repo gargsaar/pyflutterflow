@@ -1,7 +1,7 @@
 from fastapi import Depends, BackgroundTasks
 from pyflutterflow.auth import get_current_user, FirebaseUser
 from pyflutterflow.database.supabase.supabase_client import SupabaseClient
-from pyflutterflow.services.notifications.models import UserNotificationsRequest, DeepLink, Notification, UserNotificationCreate
+from pyflutterflow.services.notifications.models import UserNotificationsRequest, DeepLink, Notification
 from pyflutterflow.services.notifications.fcm import PushNotificationService
 from pyflutterflow.logs import get_logger
 
