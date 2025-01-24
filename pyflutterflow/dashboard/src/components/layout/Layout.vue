@@ -41,8 +41,10 @@
       </div>
       <div class="flex flex-col flex-1 overflow-auto">
         <Navbar class="hidden md:block w-full" />
-        <main class="p-5 md:px-16 lg:px-32">
-          <slot />
+        <main class="">
+          <div class="flex flex-col items-center max-w-3xl mx-auto">
+            <slot />
+          </div>
         </main>
       </div>
     </div>

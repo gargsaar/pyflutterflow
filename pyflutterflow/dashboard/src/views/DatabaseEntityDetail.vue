@@ -1,12 +1,12 @@
 <template>
-    <div class=" my-6 flex justify-between ">
+    <div class=" my-6 w-full flex justify-between ">
         <div class="text-xl">
             <h1 class="text-xl">{{ schema.display_name }} document </h1>
             <span class="text-xs text-surface-500">Database ID => {{ route.params.id }}</span>
         </div>
         <Button v-if="!schema.read_only" @click="handleDelete" icon="fa-solid fa-trash text-red-600" text />
     </div>
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4 w-full max-w-xl">
         <div v-for="field in schema.fields">
             <div v-if="!!field && !!data">
                 <div v-if="field.type === 'String'" class="flex flex-col">

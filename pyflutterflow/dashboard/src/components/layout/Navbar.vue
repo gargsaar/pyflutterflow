@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <Menubar>
+  <div v-if="isLoggedIn">
+    <Menubar class="!border-none">
       <template #end>
         <div class="flex items-center gap-2">
           <div @click="toggle" v-if="authStore.user" class="card flex justify-center items-center gap-3 hover:cursor-pointer">
@@ -27,6 +27,8 @@ const authStore = useAuthStore();
 const menu = ref();
 
 const toggle = (event) => menu.value.toggle(event);
+
+const isLoggedIn = computed(() => authStore.user);
 
 const avatarImage = computed(() => {
   return authStore.user.photoURL ? { image: authStore.user.photoURL } : { icon: 'fa-solid fa-user' }
