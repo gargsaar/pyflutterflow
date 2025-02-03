@@ -18,6 +18,7 @@ webpages_router = APIRouter(
 
 @webpages_router.get('/terms-and-conditions', status_code=status.HTTP_200_OK)
 async def get_terms_and_conditions(request: Request):
+    """Reads the app_compliance table in Supabase, and returns the terms and conditions HTML"""
     data = await get_request(COMPLIANCE_TABLE, eq=('id', TERMS_AND_CONDITIONS_ROW_ID))
     if len(data) != 1:
         raise ValueError("Terms and conditions not found or wrong number of rows returned")
@@ -29,6 +30,7 @@ async def get_terms_and_conditions(request: Request):
 
 @webpages_router.get('/privacy-policy', status_code=status.HTTP_200_OK)
 async def get_privacy_policy(request: Request):
+    """Reads the app_compliance table in Supabase, and returns the privacy policy HTML"""
     data = await get_request(COMPLIANCE_TABLE, eq=('id', PRIVACY_POLICY_ROW_ID))
     if len(data) != 1:
         raise ValueError("Privacy policy not found or wrong number of rows returned")
@@ -41,6 +43,7 @@ async def get_privacy_policy(request: Request):
 
 @webpages_router.get('/data-removal-request', status_code=status.HTTP_200_OK)
 async def get_data_deletion_request_form(request: Request):
+    """Returns the data deletion request web form"""
     settings = PyFlutterflow().get_settings()
     return templates.TemplateResponse(
         request=request,

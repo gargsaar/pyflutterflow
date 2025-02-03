@@ -30,7 +30,7 @@
     </Divider>
 
     <Button @click="handleGoogleLogin" label="Continue with Google" type="button" severity="secondary" size="small"
-      outlined class="!font-display !font-bold !bg-black !text-white" :icon="`${authenticating ? 'fa-solid fa-spin fa-cog' : 'fa-brands fa-google'}`" />
+      outlined  class="!font-bold !bg-black !text-white" :icon="`${authenticating ? 'fa-solid fa-spin fa-cog' : 'fa-brands fa-google'}`" />
   </div>
 </template>
 

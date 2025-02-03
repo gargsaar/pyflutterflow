@@ -103,21 +103,25 @@ async def onboard_user() -> None:
 #
 @router.get("/supabase/{path:path}")
 async def supabase_get_proxy(response = Depends(proxy)):
+    """Proxy function to handle forwarding a request to Supabase."""
     return response
 
 
 @router.post("/supabase/{path:path}")
 async def supabase_post_proxy(response = Depends(proxy_with_body)):
+    """Proxy function for forwarding a POST request with a body payload to Supabase."""
     return response
 
 
 @router.patch("/supabase/{path:path}")
 async def supabase_update_proxy(response = Depends(proxy_with_body)):
+    """Proxy function for forwarding a PATCH request with a body payload to Supabase."""
     return response
 
 
 @router.delete("/supabase/{path:path}")
 async def supabase_delete_proxy(response = Depends(proxy)):
+    """Proxy function for forwarding a DELETE request to Supabase."""
     return response
 
 ################################################

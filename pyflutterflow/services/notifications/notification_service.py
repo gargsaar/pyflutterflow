@@ -1,9 +1,10 @@
-from fastapi import Depends, BackgroundTasks
+from fastapi import Depends, BackgroundTasks, HTTPException, status
 from pyflutterflow.auth import get_current_user, FirebaseUser
 from pyflutterflow.database.supabase.supabase_client import SupabaseClient
 from pyflutterflow.services.notifications.models import UserNotificationsRequest, DeepLink, Notification
 from pyflutterflow.services.notifications.fcm import PushNotificationService
 from pyflutterflow.logs import get_logger
+from pyflutterflow import constants
 
 logger = get_logger(__name__)
 NOTIFICATION_TABLE = 'notifications'
@@ -31,12 +32,14 @@ def get_deeplink(unr: UserNotificationsRequest,) -> DeepLink | None:
     )
 
 
-async def send_notification_to_users(unr: UserNotificationsRequest, background_tasks: BackgroundTasks,  _: FirebaseUser = Depends(get_current_user)) -> None:
+async def send_notification_to_users(unr: UserNotificationsRequest, background_tasks: BackgroundTasks,  current_user: FirebaseUser = Depends(get_current_user)) -> None:
     client = await SupabaseClient().get_client()
     pns = PushNotificationService()
     deeplink = get_deeplink(unr)
 
     if unr.recipient_ids == 'all':
+        if current_user.role != constants.ADMIN_ROLE:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Tried to send a push to all users but invoker is not an admin.")
         unr.recipient_ids = pns.get_all_users()
 
     logger.debug("Sending notification to users. Deep link: %s", str(deeplink) if deeplink else None)

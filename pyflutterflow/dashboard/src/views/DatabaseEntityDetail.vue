@@ -7,7 +7,7 @@
         <Button v-if="!schema.read_only" @click="handleDelete" icon="fa-solid fa-trash text-red-600" text />
     </div>
     <div class="flex flex-col gap-4 w-full max-w-xl">
-        <div v-for="field in schema.fields">
+        <div v-for="field in schema.fields" class="my-6">
             <div v-if="!!field && !!data">
                 <div v-if="field.type === 'String'" class="flex flex-col">
                     <label class="text-surface-600">{{ field.fieldName.replace(/_/g, ' ') }}</label>
@@ -16,6 +16,10 @@
                 <div v-else-if="field.type === 'Date'" class="flex flex-col">
                     <label class="text-surface-600">{{ field.fieldName.replace(/_/g, ' ') }}</label>
                     <DatePicker v-model="data[field.fieldName]" dateFormat="yy-mm-dd" />
+                </div>
+                <div v-else-if="field.type === 'Boolean'" class="flex flex-col">
+                    <label class="text-surface-600">{{ field.fieldName.replace(/_/g, ' ') }}</label>
+                    <Checkbox v-model="data[field.fieldName]" binary />
                 </div>
                 <div v-else-if="field.type === 'Integer'" class="flex flex-col">
                     <label class="text-surface-600">{{ field.fieldName.replace(/_/g, ' ') }}</label>
@@ -54,6 +58,7 @@
 import { onMounted, ref } from 'vue';
 import Button from 'primevue/button';
 import InputNumber from 'primevue/inputnumber';
+import Checkbox from 'primevue/checkbox';
 import DatePicker from 'primevue/datepicker';
 import { useRoute, useRouter } from "vue-router";
 import { useDatabaseEntityStore } from '@/stores/databaseEntity.store';
