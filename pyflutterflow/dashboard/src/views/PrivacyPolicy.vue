@@ -1,11 +1,11 @@
 <template>
 
-  <div class="flex justify-between mb-6">
+  <div class="flex w-full justify-between mb-6">
     <h1 class="text-2xl">Privacy Policy</h1>
     <Button @click="saveChanges" label="Save" type="button" severity="info" icon="fas fa-save" />
   </div>
 
-  <div id="app">
+  <div id="app" class="w-full">
     <quill-editor v-model:content="complianceStore.privacyPolicyHTML" contentType="html" theme="snow"></quill-editor>
   </div>
 </template>

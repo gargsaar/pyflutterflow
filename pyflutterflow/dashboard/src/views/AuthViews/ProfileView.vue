@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-6 mt-10 max-w-lg justify-center mx-auto">
+  <div class="flex flex-col gap-6 mt-10 max-w-lg justify-center mx-auto w-full">
 
     <div class="flex justify-between">
       <Avatar v-bind="avatarImage" :image="authStore.user.photoURL" size="larger" shape="circle" />
@@ -9,7 +9,7 @@
       </div>
     </div>
 
-    <form @submit.prevent="updateUserProfile" class="flex flex-col gap-6 mt-10">
+    <form @submit.prevent="updateUserProfile" class="flex flex-col gap-6 mt-10 w-full">
       <TextInput disabled icon="fa-solid fa-at" v-model="formData.email" identifier="emailField" inputType="email"
         label="Email" />
       <TextInput v-model="formData.name" icon="fa-solid fa-signature" identifier="nameField" inputType="text"

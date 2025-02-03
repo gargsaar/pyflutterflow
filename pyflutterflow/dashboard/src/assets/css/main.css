@@ -6,7 +6,7 @@
 
 
 body {
-  @apply bg-surface-0 font-comfortaa text-surface-800 dark:bg-surface-700 dark:text-surface-0;
+  @apply bg-surface-0 font-default text-surface-800 dark:bg-surface-700 dark:text-surface-0;
 }
 
 

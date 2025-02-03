@@ -9,6 +9,7 @@ import LoginView from '@/views/AuthViews/LoginView.vue';
 import ProfileView from '@/views/AuthViews/ProfileView.vue';
 import TermsAndConds from '@/views/TermsAndConds.vue';
 import PrivacyPolicy from '@/views/PrivacyPolicy.vue';
+import SendNotification from '@/views/SendNotification.vue';
 import NotFound404 from '@/views/NotFound404.vue';
 
 const router = createRouter({
@@ -18,6 +19,12 @@ const router = createRouter({
       path: '/',
       name: 'HomeView',
       component: HomeView,
+      meta: { requiresAuth: true, requiresVerifiedEmail: true},
+    },
+    {
+      path: '/send-notification',
+      name: 'SendNotification',
+      component: SendNotification,
       meta: { requiresAuth: true, requiresVerifiedEmail: true},
     },
     {

@@ -1,10 +1,12 @@
 <template>
   <div class="flex flex-col gap-1 md:gap-3 mt-2 md:mt-4">
-    <img src="@/assets/images/logo.png" alt="logo image" class="mx-auto w-20 dark:invert" />
+
+    <img src="@/assets/images/logo.png" alt="logo image" class="mx-auto w-20 dark:invert rounded-lg" />
+
     <form @submit.prevent="handleLoginSubmit" class="flex flex-col gap-2 md:gap-3 mt-2">
       <div class="flex items-center gap-2 text-surface-400 justify-center">
-        <i class="fa-solid fa-user text-sm"></i>
-        <h2 class="text-surface-400 text-center text-xs md:text-sm font-display">Please login to continue</h2>
+        <i class="fa-solid fa-user-shield text-sm"></i>
+        <h2 class="text-surface-400 text-center text-xs md:text-sm font-display">Administration</h2>
       </div>
 
       <TextInput placeholder="john@example.com" v-model="formData.email" identifier="emailField" inputType="email" label="Email" class="text-sm" />
@@ -13,8 +15,8 @@
       <PasswordResetModal />
 
       <div>
-        <Button :label="authenticating ? 'Authenticating...' : 'Log in'" type="submit" class="w-full !py-2"
-          :icon="`fa-solid ${authenticating ? 'fa-solid fa-spin fa-cog' : 'fa-user'}`" size="small" />
+        <Button :label="authenticating ? 'Authenticating...' : 'Log in'" type="submit" class="!font-display !font-bold w-full"
+          :icon="`fa-solid ${authenticating ? 'fa-solid fa-spin fa-cog' : ''}`" size="small" />
         <div v-if="loginError" class="flex items-center gap-2 text-xs m-1 text-error">
           <i class="fa-solid fa-exclamation-circle"></i>
           <span>{{ loginError }}</span>
@@ -28,7 +30,7 @@
     </Divider>
 
     <Button @click="handleGoogleLogin" label="Continue with Google" type="button" severity="secondary" size="small"
-      outlined class="!py-2" :icon="`${authenticating ? 'fa-solid fa-spin fa-cog' : 'fa-brands fa-google'}`" />
+      outlined  class="!font-bold !bg-black !text-white" :icon="`${authenticating ? 'fa-solid fa-spin fa-cog' : 'fa-brands fa-google'}`" />
   </div>
 </template>
 

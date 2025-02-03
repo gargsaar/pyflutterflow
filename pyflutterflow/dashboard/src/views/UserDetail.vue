@@ -5,7 +5,7 @@
       <ProgressSpinner style="width: 60px; height: 60px" strokeWidth="5" />
     </div>
 
-  <div v-else-if="user" class="">
+  <div v-else-if="user" class="w-full ">
     <div class="flex justify-between">
       <div class="flex flex-col">
         <span class="text-xl">{{ user.display_name }}</span>

@@ -37,6 +37,15 @@
       </router-link>
     </div>
 
+
+    <!-- Firebase Users -->
+    <router-link @click="sideBarVisible = false" :to="`/send-notification`" class="!m-1 !px-3 !my-12 !py-3 flex gap-4 items-center"
+      :class="`/send-notification` == route.path ? 'bg-surface-700' : ''">
+      <i class="fa-solid text-surface-0 fa-paper-plane"></i>
+      <span class="text-surface-0" v-bind="props.label">Send Push Notification</span>
+    </router-link>
+
+
     <LoadingIndicators />
 
   </div>
