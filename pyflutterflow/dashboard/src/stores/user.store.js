@@ -54,6 +54,17 @@ export const useUserStore = defineStore({
         return { severity: 'error', summary: 'Role update Failed', detail: `Something went wrong when trying change the user role. Please try again.`, life: 3000 }
       }
     },
+
+    async deleteUser(userID) {
+      try {
+        await api.post(`/admin/auth/delete-user/${userID}`);
+        return { severity: 'success', summary: 'User Deleted', detail: `The user with ID ${userID} was deleted successfully.`, life: 3000 }
+      }
+      catch (error) {
+        console.error('User delete error:', error.message);
+        return { severity: 'error', summary: 'User Delete Failed', detail: `Something went wrong when trying to delete the user. Please try again.`, life: 3000 }
+      }
+    },
   }
 })
 

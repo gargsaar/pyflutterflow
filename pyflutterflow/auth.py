@@ -140,8 +140,9 @@ async def run_supabase_firestore_user_sync(_: FirebaseUser = Depends(get_admin_u
     """
     sb_client = await SupabaseClient().get_client()
     settings = PyFlutterflow().get_settings()
+    users_table = settings.users_table or 'users'
     logger.info("Running user sync between Firebase and Supabase.")
-    response = await sb_client.table(settings.users_table).select('id').execute()
+    response = await sb_client.table(users_table).select('id').execute()
     supabase_users = [user['id'] for user in response.data]
     firestore_client = FirestoreClient().get_client()
     user_col = firestore_client.collection("users")
@@ -151,11 +152,11 @@ async def run_supabase_firestore_user_sync(_: FirebaseUser = Depends(get_admin_u
                 user = userdoc.to_dict()
                 logger.info("Adding user: %s", userdoc.id)
                 if user.get('display_name') and user.get('email'):
-                    await sb_client.table(settings.users_table).insert({
+                    await sb_client.table(users_table).insert({
                         'id': userdoc.id,
                         'email': user.get('email'),
                         'display_name': user.get('display_name'),
-                        'photo_url': user.get('photo_url') or ''
+                        'photo_url': user.get('photo_url') or settings.avatar_placeholder_url or ''
                     }).execute()
                 else:
                     logger.error("User %s does not have a display name or email.", userdoc.id)
@@ -166,13 +167,15 @@ async def run_supabase_firestore_user_sync(_: FirebaseUser = Depends(get_admin_u
 
 
 async def onboard_new_user(current_user: FirebaseUser = Depends(get_current_user)):
+    """Create a new user record in Supabase and send a welcome email to the user."""
     settings = PyFlutterflow().get_settings()
+    users_table = settings.users_table or 'users'
     sb_client = await SupabaseClient().get_client()
     firestore_client = FirestoreClient().get_client()
     doc = await firestore_client.collection('users').document(current_user.uid).get()
     user_data = doc.to_dict()
     try:
-        response = await sb_client.table(settings.users_table).upsert({
+        response = await sb_client.table(users_table).upsert({
             'id': current_user.uid,
             'email': current_user.email,
             'display_name': user_data.get('display_name', current_user.name),
@@ -217,3 +220,36 @@ async def set_user_role(user_claim: FirebaseUserClaims, user: FirebaseUser = Dep
 
 async def generate_firebase_verify_link(email: str) -> str:
     return auth.generate_email_verification_link(email)
+
+
+async def delete_user(user_uid: str, user: FirebaseUser = Depends(get_admin_user)):
+    """Delete a user from the firebase auth system."""
+    if user.role != constants.ADMIN_ROLE:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User delete denied: Admin check failed.")
+
+    # From Firebase Auth
+    try:
+        auth.delete_user(user_uid)
+        logger.info("Deleted user: %s", user_uid)
+    except Exception as e:
+        logger.error("Error encountered during deleting user: %s", e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Error encountered while deleting user.')
+
+    # From Firestore
+    try:
+        firestore_client = FirestoreClient().get_client()
+        user_doc_ref = firestore_client.collection('users').document(user_uid)
+        user_doc_ref.delete()
+        logger.info("Deleted Firestore data for user %s", user_uid)
+    except Exception as e:
+        logger.error("Error deleting Firestore data for user %s: %s", user_uid, e)
+
+    # From Supabase
+    try:
+        client = await SupabaseClient().get_client()
+        settings = PyFlutterflow().get_settings()
+        users_table = settings.users_table or 'users'
+        await client.table(users_table).delete().eq('id', user_uid).execute()
+        logger.info("Deleted Supabase data for user %s", user_uid)
+    except Exception as e:
+        logger.error("Error deleting Supabase data for user %s: %s", user_uid, e)

@@ -178,3 +178,12 @@ async def patch_request(table: str, id: str, data: dict):
     except APIError as e:
         logger.error("Error during supabase PATCH request: %s", e)
         raise ValueError(f'Error during pyflutterflow Supabase PATCH request: {e}')
+
+
+async def delete_request(table: str, id: str | int):
+    client = await SupabaseClient().get_client()
+    try:
+        return await client.table(table).delete().eq('id', id).execute()
+    except APIError as e:
+        logger.error("Error during supabase DELETE request: %s", e)
+        raise ValueError(f'Error during pyflutterflow Supabase PATCH request: {e}')
