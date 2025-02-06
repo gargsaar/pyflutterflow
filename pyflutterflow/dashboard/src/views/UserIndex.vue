@@ -9,7 +9,7 @@
       <div>
           <ul v-if="users && users.length > 0" >
               <li v-for="user in users" :key="user.uid">
-                  <router-link class="w-full outline" :to="`/firebase-users/${user.uid}`">
+                  <router-link v-if="user.email != 'firebase@flutterflow.io'" class="w-full outline" :to="`/firebase-users/${user.uid}`">
                       <div class="flex flex-col outline outline-1 outline-surface-200 rounded-lg shadow p-3 my-3 hover:shadow-lg">
                           <span>{{ user.display_name || 'Unnamed' }}</span>
                           <span class="text-xs text-surface-600">{{ user.email }}</span>
@@ -32,7 +32,7 @@
 
 <script setup>
 
-import { ref, computed } from 'vue'
+import {  computed } from 'vue'
 import { useUserStore } from '@/stores/user.store'
 import ProgressSpinner from 'primevue/progressspinner';
 import Button from 'primevue/button';

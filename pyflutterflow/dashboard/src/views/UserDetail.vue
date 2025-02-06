@@ -17,7 +17,7 @@
     <span class="text">{{ user.email }}</span>
     <Badge v-if="isAdmin" class="ml-3">Admin</Badge>
 
-    <div class="flex justify-between mt-32">
+    <div class="flex flex-col md:flex-row justify-between mt-32">
       <div class="flex flex-col justify-end">
         <span class="text-xs text-surface-600">Last login was  </span> <span class="text-sm text-surface-800">{{ formatDate(user.last_login_at) }}</span>
         <br>
@@ -27,6 +27,9 @@
         <Button size="small" icon="fas fa-user-shield text-surface-0" v-if="!isAdmin" @click="handleMakeAdmin(user.uid)" label="Make Admin" class="mt-4" />
         <Button v-else size="small" @click="handleRevokeAdmin(user.uid)" severity="info" icon="fas fa-close text-surface-0" label="Revoke admin privilages" class="mt-4" />
       </div>
+    </div>
+    <div class="flex justify-start mt-16">
+      <Button size="small" @click="handleDeleteUser(user.uid)" severity="error" icon="fas fa-user-slash text-surface-0" label="Delete User" class="mt-4 !border-none !bg-red-500" />
     </div>
   </div>
 
@@ -42,11 +45,12 @@ import Button from 'primevue/button';
 import Badge from 'primevue/badge';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from "primevue/useconfirm";
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { format } from 'date-fns';
 
 
 const route = useRoute();
+const router = useRouter();
 const confirm = useConfirm();
 const toast = useToast();
 
@@ -79,6 +83,22 @@ const handleRevokeAdmin = async (userId) => {
       const toastResponse = await userStore.setUserRole(userId, 'user')
       toast.add(toastResponse);
       await userStore.getUserByUid(route.params.uid)
+    }
+  });
+}
+
+
+const handleDeleteUser = async (userId) => {
+  confirm.require({
+    header: `Delete this user?`,
+    message: `User '${userId}' will be permanently deleted from both Firebase and Supabase. This may have unintended consequences and is not reversible.`,
+    icon: 'fa-solid fa-exclamation-circle',
+    rejectLabel: 'Cancel',
+    confirmLabel: 'Delete user',
+    accept: async () => {
+      const toastResponse = await userStore.deleteUser(userId, 'admin')
+      toast.add(toastResponse);
+      await router.push('/firebase-users')
     }
   });
 }

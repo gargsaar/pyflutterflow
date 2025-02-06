@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, UploadFile, File
 from starlette.responses import FileResponse
 from pyflutterflow.logs import get_logger
 from pyflutterflow import PyFlutterflow
-from pyflutterflow.auth import (set_user_role, get_users_list, get_current_user, get_firebase_user_by_uid,
+from pyflutterflow.auth import (set_user_role, get_users_list, get_current_user, get_firebase_user_by_uid, delete_user,
                                 FirebaseUser, FirebaseAuthUser, run_supabase_firestore_user_sync, onboard_new_user)
 from pyflutterflow.database.supabase.supabase_functions import proxy, proxy_with_body
 from pyflutterflow.services.cloudinary_service import CloudinaryService
@@ -62,6 +62,11 @@ async def get_user_by_id(users: list = Depends(get_firebase_user_by_uid)):
     Get a Firebase user by their UID. This route is only accessible to admins.
     """
     return users
+
+
+@router.post("/admin/auth/delete-user/{user_uid}", dependencies=[Depends(delete_user)])
+async def admin_user_delete() -> None:
+    pass
 
 
 
