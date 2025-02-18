@@ -50,8 +50,8 @@ export const useUserStore = defineStore({
         return { severity: 'success', summary: 'Role Updated', detail: `The user with ID ${userID} has changed role.`, life: 3000 }
       }
       catch (error) {
-        console.error('Admin privileges error:', error.message);
-        return { severity: 'error', summary: 'Role update Failed', detail: `Something went wrong when trying change the user role. Please try again.`, life: 3000 }
+        console.error('Role privileges error:', error.message);
+        return { severity: 'error', summary: 'Role update failed', detail: `Something went wrong when trying change the user role. Please try again.`, life: 3000 }
       }
     },
 

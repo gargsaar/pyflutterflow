@@ -15,7 +15,7 @@
     </div>
 
     <span class="text">{{ user.email }}</span>
-    <Badge v-if="isAdmin" class="ml-3">Admin</Badge>
+    <Badge v-if="currentRole == 'admin'" class="ml-3">Admin</Badge>
 
     <div class="flex flex-col md:flex-row justify-between mt-32">
       <div class="flex flex-col justify-end">
@@ -23,14 +23,15 @@
         <br>
         <span class="text-xs text-surface-600">Joined  </span> <span class="text-sm text-surface-800">{{ formatDate(user.created_at) }}</span>
       </div>
-      <div class="flex flex-col justify-end">
-        <Button size="small" icon="fas fa-user-shield text-surface-0" v-if="!isAdmin" @click="handleMakeAdmin(user.uid)" label="Make Admin" class="mt-4" />
-        <Button v-else size="small" @click="handleRevokeAdmin(user.uid)" severity="info" icon="fas fa-close text-surface-0" label="Revoke admin privilages" class="mt-4" />
+      <div v-if="!!roles" class="flex flex-col justify-end">
+        <Select v-model="selectedRole" :options="roles" optionLabel="label" placeholder="Select a Role" class="w-full md:w-56" />
+        <Button size="small" icon="fas fa-user-shield text-surface-0" @click="handleSetRole(user.uid)" :label="isLoading ? 'Setting role...' : 'Set Role'" :loading="isLoading" class="mt-4" />
       </div>
     </div>
     <div class="flex justify-start mt-16">
       <Button size="small" @click="handleDeleteUser(user.uid)" severity="error" icon="fas fa-user-slash text-surface-0" label="Delete User" class="mt-4 !border-none !bg-red-500" />
     </div>
+
   </div>
 
 
@@ -38,7 +39,7 @@
 
 <script setup>
 
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user.store'
 import ProgressSpinner from 'primevue/progressspinner';
 import Button from 'primevue/button';
@@ -47,40 +48,53 @@ import { useToast } from 'primevue/usetoast';
 import { useConfirm } from "primevue/useconfirm";
 import { useRoute, useRouter } from 'vue-router';
 import { format } from 'date-fns';
+import { useAuthStore } from '@/stores/auth.store';
+import Select from 'primevue/select';
 
 
+const authStore = useAuthStore();
+const roles = ref({})
 const route = useRoute();
 const router = useRouter();
 const confirm = useConfirm();
 const toast = useToast();
+const selectedRole = ref(null);
+const isLoading = ref(false);
 
 const userStore = useUserStore();
 userStore.getUserByUid(route.params.uid)
 
-const handleMakeAdmin = async (userId) => {
-  confirm.require({
-    header: 'Make this user an administator?',
-    message: 'Admins can do anything, so only grant this to trusted users.',
-    icon: 'fa-solid fa-exclamation-circle',
-    rejectLabel: 'Cancel',
-    confirmLabel: 'Confirm',
-    accept: async () => {
-      const toastResponse = await userStore.setUserRole(userId, 'admin')
-      toast.add(toastResponse);
-      await userStore.getUserByUid(route.params.uid)
-    }
-  });
+onMounted(async() => {
+  await loadData();
+});
+
+const defaultRoles = [
+  {
+    name: 'admin',
+    label: 'Admin'
+  },
+  {
+    name: 'authenticated',
+    label: 'User'
+  }
+]
+
+const loadData = async() => {
+  roles.value = authStore.dashboardConfig.roles || defaultRoles
 }
 
-const handleRevokeAdmin = async (userId) => {
+
+const handleSetRole = async (userId) => {
   confirm.require({
-    header: 'Revoke admin privilages?',
-    message: 'This user will no longer have administrator rights.',
+    header: `Set this user's role to ${selectedRole.value.label}?`,
+    message: 'Be careful when setting roles, only grant this to trusted users.',
     icon: 'fa-solid fa-exclamation-circle',
     rejectLabel: 'Cancel',
     confirmLabel: 'Confirm',
     accept: async () => {
-      const toastResponse = await userStore.setUserRole(userId, 'user')
+      isLoading.value = true
+      const toastResponse = await userStore.setUserRole(userId, selectedRole.value.name)
+      isLoading.value = false
       toast.add(toastResponse);
       await userStore.getUserByUid(route.params.uid)
     }
@@ -110,9 +124,9 @@ const formatDate = (timestamp) => {
 
 const user = computed(() => userStore.currentUser)
 
-const isAdmin = computed(() => {
+const currentRole = computed(() => {
   if (userStore.currentUser.custom_attributes) {
-    return JSON.parse(userStore.currentUser.custom_attributes).role == 'admin'
+    return JSON.parse(userStore.currentUser.custom_attributes).role
   }
 })
 
